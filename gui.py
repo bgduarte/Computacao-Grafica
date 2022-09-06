@@ -1,17 +1,18 @@
 from tkinter import *
-from typing import Callable, Final, Literal, Union
+from tkinter.ttk import Notebook
+from typing import Callable, Final, List, Literal, Tuple
 from controller import Controller
 
 
 class Gui:
-    # Consts
+    ### Consts
     FONT_SIZE_DEFAULT: Final[int] = 13
     FONT_SIZE_TITLE: Final[int] = 18
 
     WIDTH: Final[int] = 1280
     HEIGHT: Final[int] = 720
 
-    # Private attrs
+    ### Private attrs
     __root: Tk
     __controller: Controller
     __obj_varlist: Variable  # holds a list
@@ -22,24 +23,25 @@ class Gui:
         self.__root = Tk()
         self.__root.title("Sistema Básico de CG 2D")
         self.__root.resizable(width=False, height=False)
-        self.__obj_varlist = Variable(value=['a', 'b'])
+        self.__obj_varlist = Variable(value=[])
 
-    # Private methods
+    ### Private methods
     def __create_label(self, parent_frame: Frame, text: str, pady: int = 0, padx: int = 0,
-                       font_size: int = FONT_SIZE_DEFAULT, align=TOP, anchor=None) -> Label:
+                       font_size: int = FONT_SIZE_DEFAULT, align=TOP, anchor=None, pack=True) -> Label:
         label = Label(parent_frame, text=text, font=('Helvetica', font_size))
         label.pack(pady=pady, padx=padx, side=align, anchor=anchor)
         return label
 
     def __create_input(self, parent_frame: Frame, placeholder: str = "", pady: int = 0,
-                       padx: int = 0, width: int = 50, align=TOP, anchor=None) -> Entry:
-        input = Entry(parent_frame, textvariable=StringVar(value=placeholder), width=width)
-        input.pack(ipady=3, pady=pady, padx=padx, side=align, anchor=anchor)
+                       padx: int = 0, align=TOP, anchor=None, pack=True) -> Entry:
+        input = Entry(parent_frame, textvariable=StringVar(value=placeholder))
+        if pack:
+            input.pack(ipady=3, pady=pady, padx=padx, side=align, anchor=anchor)
         return input
 
-    def __create_button(self, parent_frame: Frame, text: str, handler: Callable, *args,
+    def __create_button(self, parent_frame: Frame, text: str, handler: Callable, *handler_args,
                         pady: int = 0, padx: int = 0, align=TOP, anchor=None) -> Button:
-        btn = Button(parent_frame, text=text, command=lambda: handler(*args))
+        btn = Button(parent_frame, text=text, command=lambda: handler(*handler_args))
         btn.pack(pady=pady, padx=padx, side=align, anchor=anchor)
         return btn
 
@@ -47,20 +49,20 @@ class Gui:
     def __create_main_frame(self) -> Frame:
         main_frame = Frame(self.__root, width=self.WIDTH, height=self.HEIGHT)
         main_frame.pack(fill=BOTH, expand=True)
-        main_frame.pack_propagate(0)
+        main_frame.pack_propagate(False)
         return main_frame
 
     def __create_obj_list_frame(self, main_frame: Frame) -> Frame:
         obj_list_frame = LabelFrame(main_frame, text="Display File", font=('Helvetica', self.FONT_SIZE_DEFAULT),
             width=self.WIDTH/4, height=self.HEIGHT*4/6, borderwidth=2, relief=GROOVE)
         obj_list_frame.pack(padx=10, pady=10, side=TOP, anchor=W, fill=Y, expand=True)
-        obj_list_frame.pack_propagate(0)
+        obj_list_frame.pack_propagate(False)
 
         list_box = Listbox(obj_list_frame, listvariable=self.__obj_varlist, selectmode=SINGLE, bg="#fff")
         list_box.pack(pady=1, padx=4, side=TOP, anchor=W, fill=BOTH, expand=True)
         
-        self.__create_button(obj_list_frame, "Remover Objeto", self.__handle_remove_obj, list_box, padx=4, pady=2, align=LEFT)
-        self.__create_button(obj_list_frame, "Adicionar Objeto", self.__handle_add_obj, padx=4, pady=2, align=RIGHT)
+        self.__create_button(obj_list_frame, "Remover Objeto", self.__handle_remove_obj_btn, list_box, padx=4, pady=2, align=LEFT)
+        self.__create_button(obj_list_frame, "Adicionar Objeto", self.__handle_add_obj_btn, padx=4, pady=2, align=RIGHT)
         
         return obj_list_frame
 
@@ -83,6 +85,38 @@ class Gui:
         Button(navigation_frame, text="↓", command=lambda: self.__handle_nav('down')).grid(row=2, column=1)
         
         return navigation_frame
+    
+    def __create_add_obj_form(self) -> None:
+        form = Toplevel(self.__root)
+        form.title("Adicionar Objeto")
+        
+        form_frame = Frame(form, width=400, height=600)
+        form_frame.pack(fill=BOTH, expand=True)
+        form_frame.pack_propagate(False)
+
+        self.__create_label(form_frame, "Nome do novo objeto:", pady=6, padx=10, anchor=NW)
+        obj_name_input = self.__create_input(form_frame, padx=7, anchor=NW)
+
+        tabs = Notebook(form_frame)
+        tabs.pack(pady=10, fill=BOTH, expand=True)
+        tabs_coords_inputs = []
+        for i, tab_name in enumerate(['Ponto', 'Linha', 'Polígono']):
+            tab_frame = Frame(tabs)
+            tab_frame.pack(fill=BOTH, expand=True)
+            self.__create_label(tab_frame, "Coordenadas:", pady=4, padx=10, anchor=NW)
+            coords_inputs = []
+            for _ in range(i+1):
+                coords_inputs = self.__add_coord_inputs(tab_frame, coords_inputs)
+            tabs_coords_inputs.append(coords_inputs)
+
+            if tab_name == 'Polígono':
+                self.__create_button(tab_frame, "+", self.__add_coord_inputs, tab_frame, tabs_coords_inputs[2], align=RIGHT)
+                self.__create_button(tab_frame, "–", self.__remove_last_coords_input, tabs_coords_inputs[2], align=RIGHT)
+            
+            tabs.add(tab_frame, text=tab_name)
+        
+        self.__create_button(form_frame, "Adicionar", self.__handle_add_obj_form, form, tabs, obj_name_input, tabs_coords_inputs, pady=10, align=BOTTOM)
+    
 
     def __create_gui(self) -> None:
         main_frame = self.__create_main_frame()
@@ -90,7 +124,7 @@ class Gui:
         self.__create_navigation_frame(main_frame)
 
     # Handlers
-    def __handle_remove_obj(self, list_box: Listbox) -> None:
+    def __handle_remove_obj_btn(self, list_box: Listbox) -> None:
         if list_box.curselection() == (): return
         selected_idx, = list_box.curselection()
         obj_list = list(self.__obj_varlist.get())
@@ -98,9 +132,22 @@ class Gui:
         self.__obj_varlist.set(obj_list)
         # TODO: Call controller remove
 
-    def __handle_add_obj(self) -> None:
+    def __handle_add_obj_btn(self) -> None:
+        self.__create_add_obj_form()
+
+    def __handle_add_obj_form(self, form: Toplevel, tabs: Notebook, obj_name_input: Entry,
+            tabs_coords_inputs: List[List[Tuple[Entry, Entry]]]) -> None:
+        if not obj_name_input.get(): return
         # TODO: Call controller add
-        pass
+        print("active tab text: ", tabs.tab(tabs.select(), "text"))
+        print("active tab idx: ", tabs.index(tabs.select()))
+        print("coords:")
+        for (x, y) in tabs_coords_inputs[tabs.index(tabs.select())]:
+            print(float(x.get()), float(y.get()))
+        obj_list = list(self.__obj_varlist.get())
+        obj_list.append(obj_name_input.get())
+        self.__obj_varlist.set(obj_list)
+        form.destroy()
         
     def __handle_nav(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
         # TODO: Call controller nav handler
@@ -110,7 +157,22 @@ class Gui:
         # TODO: Call controller zoom handler
         pass
 
-    # Public methods
+    def __add_coord_inputs(self, parent_frame: Frame, coords_inputs: List[Tuple[Entry, Entry]]) -> List[Tuple[Entry, Entry]]:
+        inputs_frame = Frame(parent_frame)
+        inputs_frame.pack(pady=10, fill=X)
+        x_input = self.__create_input(inputs_frame, "x", padx=5, align=LEFT)
+        y_input = self.__create_input(inputs_frame, "y", padx=5, align=LEFT)
+        coords_inputs.append((x_input, y_input))
+        return coords_inputs
+    
+    def __remove_last_coords_input(self, coords_inputs: List[Tuple[Entry, Entry]]) -> List[Tuple[Entry, Entry]]:
+        print(len(coords_inputs))
+        if len(coords_inputs) <= 3: return coords_inputs
+        for input in coords_inputs.pop():
+            input.master.destroy()
+        return coords_inputs
+
+    ### Public methods
     def run(self) -> None:
         self.__create_gui()
         self.__root.mainloop()
