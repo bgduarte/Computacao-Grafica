@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter.ttk import Notebook
 from typing import Callable, Final, List, Literal, Tuple
 from controller import Controller
+from aux import Coordinate2D
 
 
 class Gui:
@@ -11,6 +12,9 @@ class Gui:
 
     WIDTH: Final[int] = 1280
     HEIGHT: Final[int] = 720
+
+    CANVAS_WIDTH: Final[int] = WIDTH*3/4
+    CANVAS_HEIGHT: Final[int] = HEIGHT*2/6
 
     ### Private attrs
     __root: Tk
@@ -47,7 +51,7 @@ class Gui:
 
     # GUI components
     def __create_main_frame(self) -> Frame:
-        main_frame = Frame(self.__root, width=self.WIDTH, height=self.HEIGHT)
+        main_frame = Frame(self.__root, width=self.WIDTH/4, height=self.HEIGHT)
         main_frame.pack(fill=BOTH, expand=True)
         main_frame.pack_propagate(False)
         return main_frame
@@ -138,12 +142,13 @@ class Gui:
     def __handle_add_obj_form(self, form: Toplevel, tabs: Notebook, obj_name_input: Entry,
             tabs_coords_inputs: List[List[Tuple[Entry, Entry]]]) -> None:
         if not obj_name_input.get(): return
-        # TODO: Call controller add
-        print("active tab text: ", tabs.tab(tabs.select(), "text"))
-        print("active tab idx: ", tabs.index(tabs.select()))
-        print("coords:")
-        for (x, y) in tabs_coords_inputs[tabs.index(tabs.select())]:
-            print(float(x.get()), float(y.get()))
+
+        obj_coords = [Coordinate2D(float(x.get()), float(y.get()))
+                      for (x, y) in tabs_coords_inputs[tabs.index(tabs.select())]]
+
+        # TODO: fix typing and not uptadting canvas
+        self.__controller.create_object(obj_name_input.get(), tabs.index(tabs.select())+1, obj_coords)
+
         obj_list = list(self.__obj_varlist.get())
         obj_list.append(obj_name_input.get())
         self.__obj_varlist.set(obj_list)
@@ -176,3 +181,8 @@ class Gui:
     def run(self) -> None:
         self.__create_gui()
         self.__root.mainloop()
+
+    def create_canvas(self):
+        canvas = Canvas(self.__root, bg="white", width=self.WIDTH*3/4, height=self.HEIGHT-40)
+        canvas.pack(padx=10, pady=10, side=RIGHT, anchor=W)
+        return canvas
