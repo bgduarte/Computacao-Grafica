@@ -10,6 +10,8 @@ class Displayable:
         self.__name = name
         self.__coordinates = coordinates
         self.__contraint_check()
+        if not issubclass(type(self), Displayable):
+            raise Exception("Displayable is a base class, it is no supposed to be instantiated")
 
     # public methods
     def add_coordinate(self, x, y):

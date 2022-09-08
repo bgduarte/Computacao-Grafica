@@ -134,7 +134,7 @@ class Gui:
         obj_list = list(self.__obj_varlist.get())
         obj_list.pop(selected_idx)
         self.__obj_varlist.set(obj_list)
-        # TODO: Call controller remove
+        # TODO: Call controller remove, fix redundant list in gui, should use display file for displaying the list
 
     def __handle_add_obj_btn(self) -> None:
         self.__create_add_obj_form()
@@ -155,12 +155,11 @@ class Gui:
         form.destroy()
         
     def __handle_nav(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
-        # TODO: Call controller nav handler
-        pass
+        self.__controller.navigate(direction)
 
     def __handle_zoom(self, direction: Literal['in', 'out']) -> None:
-        # TODO: Call controller zoom handler
-        pass
+        # TODO: fix this
+        self.__controller.zoom(1 if direction == 'in' else 2)
 
     def __add_coord_inputs(self, parent_frame: Frame, coords_inputs: List[Tuple[Entry, Entry]]) -> List[Tuple[Entry, Entry]]:
         inputs_frame = Frame(parent_frame)
@@ -180,7 +179,10 @@ class Gui:
     ### Public methods
     def run(self) -> None:
         self.__create_gui()
-        self.__root.mainloop()
+
+    def update(self) -> None:
+        self.__root.update_idletasks()
+        self.__root.update()
 
     def create_canvas(self):
         canvas = Canvas(self.__root, bg="white", width=self.WIDTH*3/4, height=self.HEIGHT-40)
