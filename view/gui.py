@@ -1,8 +1,9 @@
 from tkinter import *
 from tkinter.ttk import Notebook
 from typing import Callable, Final, List, Literal, Tuple
-from controller import Controller
-from aux import Coordinate2D
+from controller.controller import Controller
+from model.coordinate import Coordinate2D
+from model.displayable import Displayable
 
 
 class Gui:
@@ -19,7 +20,7 @@ class Gui:
     ### Private attrs
     __root: Tk
     __controller: Controller
-    __obj_varlist: Variable  # holds a list
+    __obj_varlist: Variable  # holds a Dict
 
     # Constructor
     def __init__(self, controller: Controller) -> None:
@@ -28,6 +29,7 @@ class Gui:
         self.__root.title("Sistema Básico de CG 2D")
         self.__root.resizable(width=False, height=False)
         self.__obj_varlist = Variable(value=[])
+        controller.observable_display_file.subscribe(self.update_obj_varlist)
 
     ### Private methods
     def __create_label(self, parent_frame: Frame, text: str, pady: int = 0, padx: int = 0,
@@ -131,10 +133,7 @@ class Gui:
     def __handle_remove_obj_btn(self, list_box: Listbox) -> None:
         if list_box.curselection() == (): return
         selected_idx, = list_box.curselection()
-        obj_list = list(self.__obj_varlist.get())
-        obj_list.pop(selected_idx)
-        self.__obj_varlist.set(obj_list)
-        # TODO: Call controller remove, fix redundant list in gui, should use display file for displaying the list
+        self.__controller.observable_display_file.remove_at(selected_idx)
 
     def __handle_add_obj_btn(self) -> None:
         self.__create_add_obj_form()
@@ -142,16 +141,10 @@ class Gui:
     def __handle_add_obj_form(self, form: Toplevel, tabs: Notebook, obj_name_input: Entry,
             tabs_coords_inputs: List[List[Tuple[Entry, Entry]]]) -> None:
         if not obj_name_input.get(): return
-
         obj_coords = [Coordinate2D(float(x.get()), float(y.get()))
                       for (x, y) in tabs_coords_inputs[tabs.index(tabs.select())]]
-
-        # TODO: fix typing and not uptadting canvas
+        # TODO: fix typing
         self.__controller.create_object(obj_name_input.get(), tabs.index(tabs.select())+1, obj_coords)
-
-        obj_list = list(self.__obj_varlist.get())
-        obj_list.append(obj_name_input.get())
-        self.__obj_varlist.set(obj_list)
         form.destroy()
         
     def __handle_nav(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
@@ -170,7 +163,6 @@ class Gui:
         return coords_inputs
     
     def __remove_last_coords_input(self, coords_inputs: List[Tuple[Entry, Entry]]) -> List[Tuple[Entry, Entry]]:
-        print(len(coords_inputs))
         if len(coords_inputs) <= 3: return coords_inputs
         for input in coords_inputs.pop():
             input.master.destroy()
@@ -188,3 +180,8 @@ class Gui:
         canvas = Canvas(self.__root, bg="white", width=self.WIDTH*3/4, height=self.HEIGHT-40)
         canvas.pack(padx=10, pady=10, side=RIGHT, anchor=W)
         return canvas
+    
+    def update_obj_varlist(self, objects: List[Displayable]) -> None:
+        obj_list = [displayable.get_name() for displayable in objects]
+        self.__obj_varlist.set(obj_list)
+

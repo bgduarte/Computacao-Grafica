@@ -1,9 +1,10 @@
 from tkinter import *
 from typing import List, Literal
-from displayable import Displayable
-from dot import Dot
-from line import Line
-from aux import Coordinate2D
+from model.display_file import ObservableDisplayFile
+from model.displayable import Displayable
+from model.dot import Dot
+from model.line import Line
+from model.coordinate import Coordinate2D
 
 
 class Viewport:
@@ -49,6 +50,7 @@ class Viewport:
         self.__window[0].y += movement_vector.y
         self.__window[1].x += movement_vector.x
         self.__window[1].y += movement_vector.y
+
     def __tranform_coord(self, coord) -> Coordinate2D:
         w_min = self.__window[0]
         w_max = self.__window[1]
@@ -61,11 +63,10 @@ class Viewport:
                 w_max.y - w_min.y)) * (v_max.y - v_min.y)
         return Coordinate2D(x, y)
 
-    def draw(self, displayFile: List[Displayable]):
+    def draw(self, display_file: List[Displayable]):
         # TODO: not redraw all every time
         self.__canvas.delete('all')
-        for displayable in displayFile:
-
+        for displayable in display_file:
             coordinates = displayable.get_coordinates()
             for i in range(len(coordinates)):
                 # Transform coordinate
@@ -97,7 +98,6 @@ class Viewport:
         self.__zoom(Viewport.ZOOM_AMOUNT)
 
     def navigate(self, direction: Literal['up', 'down', 'left', 'right']):
-        print(direction)
         if direction == 'up':
             self.__move_window(Coordinate2D(0, Viewport.NAVIGATION_SPEED))
         elif direction == 'down':
