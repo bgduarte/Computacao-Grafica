@@ -54,4 +54,4 @@ class Coordinate2D(List):
         self.transform([TransformHelper.translation_matrix(movement_vector)])
 
     def scale(self, scale_vector):
-        self.transform([TransformHelper.scale_vector(scale_vector)])
+        self.transform([TransformHelper.scale_matrix(scale_vector)])
