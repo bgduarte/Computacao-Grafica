@@ -1,6 +1,6 @@
 from typing import List
 from model.coordinate import Coordinate2D
-from model.transform_helper import  TransformHelper
+from utils.transform_helper import  TransformHelper
 # Abstract class
 class Displayable:
     # private attributes
