@@ -1,6 +1,5 @@
 from typing import List
-import numpy as np
-from utils.transform_helper import TransformHelper
+from utils.matrix_helper import MatrixHelper
 
 
 class Coordinate2D(List):
@@ -38,20 +37,20 @@ class Coordinate2D(List):
 
     # Transforms coordinate based on a list of transform operations, represented by matrices
     def transform(self, transformations_matrices: list):
-        matrix = self.copy()
-        matrix.append(float(1))
+        vector = self.copy()
+        vector.append(float(1))
         for t in transformations_matrices:
-            matrix = np.matmul(matrix, t)
+            vector = MatrixHelper.dot(vector, t)
 
         # Defines the new coordinates, by removing the third element in the matrix
-        self.x = matrix[0]
-        self.y = matrix[1]
+        self.x = vector[0]
+        self.y = vector[1]
 
     def rotate(self, angle):
-        self.transform([TransformHelper.rotation_matrix(angle)])
+        self.transform([MatrixHelper.rotation_matrix(angle)])
 
     def translate(self, movement_vector):
-        self.transform([TransformHelper.translation_matrix(movement_vector)])
+        self.transform([MatrixHelper.translation_matrix(movement_vector)])
 
     def scale(self, scale_vector):
-        self.transform([TransformHelper.scale_matrix(scale_vector)])
+        self.transform([MatrixHelper.scale_matrix(scale_vector)])

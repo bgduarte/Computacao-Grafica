@@ -1,6 +1,6 @@
 from typing import List
 from model.coordinate import Coordinate2D
-from utils.transform_helper import  TransformHelper
+from utils.matrix_helper import  MatrixHelper
 # Abstract class
 class Displayable:
     # private attributes
@@ -29,13 +29,13 @@ class Displayable:
         pass
 
     def rotate(self, angle):
-        self.transform([TransformHelper.rotation_matrix(angle)])
+        self.transform([MatrixHelper.rotation_matrix(angle)])
 
     def translate(self, movement_vector: Coordinate2D):
-        self.transform([TransformHelper.translation_matrix(movement_vector)])
+        self.transform([MatrixHelper.translation_matrix(movement_vector)])
 
     def scale(self, scale_vector: Coordinate2D):
-        self.transform([TransformHelper.scale_matrix(scale_vector)])
+        self.transform([MatrixHelper.scale_matrix(scale_vector)])
 
     # Transforms polygon based on a list of transform operations, represented by matrices
     def transform(self, transformations_matrices: list):
@@ -61,21 +61,21 @@ class Displayable:
         center_coord = self.get_center_coord()
         self.transform([
             # Translate to origin
-            TransformHelper.translation_matrix(-center_coord),  # TODO: investigate translation backwards
+            MatrixHelper.translation_matrix(-center_coord),  # TODO: investigate translation backwards
             # Scale
-            TransformHelper.scale_matrix(scale_vector),
+            MatrixHelper.scale_matrix(scale_vector),
             # Translate back to the same position
-            TransformHelper.translation_matrix(center_coord)
+            MatrixHelper.translation_matrix(center_coord)
         ])
 
     def rotate_around_point(self, angle: float, point: Coordinate2D): # angle in degrees
         translation_vector = point
-        print(TransformHelper.translation_matrix(translation_vector))
+        print(MatrixHelper.translation_matrix(translation_vector))
         self.transform([
             # Translate to origin
-            TransformHelper.translation_matrix(-translation_vector),
+            MatrixHelper.translation_matrix(-translation_vector),
             # Rotates
-            TransformHelper.rotation_matrix(angle),
+            MatrixHelper.rotation_matrix(angle),
             # Translate back to the same position
-            TransformHelper.translation_matrix(translation_vector)
+            MatrixHelper.translation_matrix(translation_vector)
         ])
