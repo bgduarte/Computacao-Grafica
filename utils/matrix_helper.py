@@ -1,8 +1,12 @@
+from __future__ import annotations
 from math import pi
-from typing import List
+from typing import List, TYPE_CHECKING
 from math import cos, sin
 from itertools import starmap
 from operator import mul
+
+if TYPE_CHECKING:
+    from model.coordinate import Coordinate2D
 
 
 class MatrixHelper:
@@ -16,7 +20,7 @@ class MatrixHelper:
 
     @staticmethod
     # Receives a vector that represents the translation, returns a matrix to apply that operation
-    def translation_matrix(v) -> List[List[float]]:
+    def translation_matrix(v: Coordinate2D) -> List[List[float]]:
         return [
             [1,   0,   0],
             [0,   1,   0],
@@ -24,7 +28,7 @@ class MatrixHelper:
         ]
 
     @staticmethod
-    def scale_matrix(s) -> List[List[float]]:
+    def scale_matrix(s: Coordinate2D) -> List[List[float]]:
         return [
             [s.x, 0,  0],
             [0,  s.y, 0],

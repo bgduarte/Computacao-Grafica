@@ -1,14 +1,19 @@
 from typing import List
 from model.coordinate import Coordinate2D
 from utils.matrix_helper import  MatrixHelper
+
+
 # Abstract class
 class Displayable:
     # private attributes
     __name: str
+    __color: str
     __coordinates: List[Coordinate2D]
 
-    def __init__(self, name: str, coordinates: List[Coordinate2D] = None) -> None:
+    def __init__(self, name: str, color: str, coordinates: List[Coordinate2D] = None) -> None:
+        # color is '#rgb' or '#rrggbb'
         self.__name = name
+        self.__color = color
         self.__coordinates = coordinates
         self.__constraint_check()
         if not issubclass(type(self), Displayable):
@@ -24,6 +29,12 @@ class Displayable:
     
     def get_name(self) -> str:
         return self.__name
+    
+    def get_color(self) -> str:
+        return self.__color
+    def set_color(self, color: str) -> None:
+        # color is '#rgb' or '#rrggbb'
+        self.__color = color
 
     def __constraint_check(self):
         pass
@@ -39,10 +50,8 @@ class Displayable:
 
     # Transforms polygon based on a list of transform operations, represented by matrices
     def transform(self, transformations_matrices: list):
-        print(f'beforeCoord:{self.__coordinates}')
         for coord in self.__coordinates:
-            coord.transform(transformations_matrices=transformations_matrices)
-        print(f'afterCoord:{self.__coordinates}')
+            coord.transform(transformations_matrices)
 
     def get_center_coord(self):
         sum_x = 0
@@ -70,7 +79,6 @@ class Displayable:
 
     def rotate_around_point(self, angle: float, point: Coordinate2D): # angle in degrees
         translation_vector = point
-        print(MatrixHelper.translation_matrix(translation_vector))
         self.transform([
             # Translate to origin
             MatrixHelper.translation_matrix(-translation_vector),

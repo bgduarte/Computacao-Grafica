@@ -13,13 +13,9 @@ class Viewport:
     __world_origin: Coordinate2D
 
     LINE_WIDTH = 3
-    LINE_COLOR = "black"
-
-    POINT_WIDTH = 5
-    POINT_COLOR = "black"
+    POINT_WIDTH = 4
 
     ZOOM_AMOUNT = 0.1
-
     NAVIGATION_SPEED = 50
 
     def __init__(self, canvas: Canvas):
@@ -28,15 +24,15 @@ class Viewport:
         self.__window = [Coordinate2D(0, 0), Coordinate2D(self.get_width(), self.get_height())]
         self.__world_origin = Coordinate2D(0, 0)
 
-    def __draw_line(self, coord1, coord2):
+    def __draw_line(self, coord1: Coordinate2D, coord2: Coordinate2D, color: str):
         self.__canvas.create_line(coord1.x, coord1.y, coord2.x, coord2.y,
-                                  width=Viewport.LINE_WIDTH, fill=Viewport.LINE_COLOR)
+                                  width=Viewport.LINE_WIDTH, fill=color)
 
-    def __draw_point(self, coord):
+    def __draw_point(self, coord: Coordinate2D, color: str):
         self.__canvas.create_oval(coord.x, coord.y, coord.x, coord.y,
-                                  width=Viewport.POINT_WIDTH, fill=Viewport.POINT_COLOR)
+                                  width=Viewport.POINT_WIDTH, outline=color)
 
-    def __zoom(self, amount):
+    def __zoom(self, amount: float):
         window_size_x = self.__window[1].x - self.__window[0].x
         window_size_y = self.__window[1].y - self.__window[0].y
         # TODO: improve this (possibly next deploy)
@@ -51,7 +47,7 @@ class Viewport:
         self.__window[1].x += movement_vector.x
         self.__window[1].y += movement_vector.y
 
-    def __tranform_coord(self, coord) -> Coordinate2D:
+    def __tranform_coord(self, coord: Coordinate2D) -> Coordinate2D:
         w_min = self.__window[0]
         w_max = self.__window[1]
         v_max = Coordinate2D(self.get_width(), self.get_height())
@@ -71,17 +67,18 @@ class Viewport:
             for i in range(len(coordinates)):
                 # Transform coordinate
                 coord = self.__tranform_coord(coordinates[i])
+                
                 # Draw point
-                self.__draw_point(coord)
+                self.__draw_point(coord, displayable.get_color())
 
                 # Draw line
                 if i < len(coordinates) - 1:
                     next_coord = self.__tranform_coord(coordinates[i + 1])
-                    self.__draw_line(coord, next_coord)
+                    self.__draw_line(coord, next_coord, displayable.get_color())
                 else:
                     if not isinstance(displayable, Dot) and not isinstance(displayable, Line):
                         first_coord = self.__tranform_coord(coordinates[0])
-                        self.__draw_line(coord, first_coord)
+                        self.__draw_line(coord, first_coord, displayable.get_color())
 
         self.__canvas.update()
 

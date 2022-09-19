@@ -19,6 +19,9 @@ class ObservableDisplayFile:
             callback(self.__displayables)
 
     ### Public methods
+    def __getitem__(self, key: int) -> Displayable:
+        return self.__displayables[key]
+
     def subscribe(self, callback: Callable[[List[Displayable]], Any]) -> None:
         self.__callbacks.append(callback)
 
