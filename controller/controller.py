@@ -58,12 +58,20 @@ class Controller:
         self.__viewport.navigate(direction)
         self.__viewport.draw(self.observable_display_file.displayables())
 
-    def translate_object(self, object: Displayable) -> None:
-        print('translate object', object)
+    def translate_object(self, displayable: Displayable, movement_vector: Coordinate2D) -> None:
+        displayable.translate(movement_vector)
+        self.__viewport.draw(self.observable_display_file.displayables())
+
+    def scale_object(self, displayable: Displayable, scale_vector: Coordinate2D) -> None:
+        displayable.scale_around_self(scale_vector)
+        self.__viewport.draw(self.observable_display_file.displayables())
         
-    def scale_object(self, object: Displayable) -> None:
-        print('scale object', object)
-        
-    def rotate_object(self, object: Displayable, relative_to: Literal['world', 'itself', 'coordinate'], center: Coordinate2D = None) -> None:
-        print('rotate object', object, relative_to, center)
-        
+    def rotate_object(self, displayable: Displayable, angle: float,
+                      relative_to: Literal['world', 'itself', 'coordinate'], center: Coordinate2D = None) -> None:
+        if relative_to == 'world':
+            displayable.rotate(angle)
+        elif relative_to == 'itself':
+            displayable.rotate_around_self(angle)
+        elif relative_to == 'coordinate':
+            displayable.rotate_around_point(angle, center)
+        self.__viewport.draw(self.observable_display_file.displayables())
