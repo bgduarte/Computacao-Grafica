@@ -4,7 +4,7 @@ from utils.matrix_helper import MatrixHelper
 
 class Coordinate2D(List):
 
-    def __init__(self, x, y: float):
+    def __init__(self, x, y: float = None):
         if isinstance(x, list):
             super(Coordinate2D, self).__init__(x)
         else:

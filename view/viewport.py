@@ -1,9 +1,6 @@
 from tkinter import *
 from typing import List, Literal
-from model.display_file import ObservableDisplayFile
 from model.displayable import Displayable
-from model.dot import Dot
-from model.line import Line
 from model.coordinate import Coordinate2D
 
 
@@ -13,7 +10,7 @@ class Viewport:
     __world_origin: Coordinate2D
 
     LINE_WIDTH = 3
-    POINT_WIDTH = 4
+    POINT_WIDTH = 5
 
     ZOOM_AMOUNT = 0.1
     NAVIGATION_SPEED = 50
@@ -25,10 +22,13 @@ class Viewport:
         self.__world_origin = Coordinate2D(0, 0)
 
     def __draw_line(self, coord1: Coordinate2D, coord2: Coordinate2D, color: str):
+        coord1 = self.__tranform_coord(coord1)
+        coord2 = self.__tranform_coord(coord2)
         self.__canvas.create_line(coord1.x, coord1.y, coord2.x, coord2.y,
                                   width=Viewport.LINE_WIDTH, fill=color)
 
     def __draw_point(self, coord: Coordinate2D, color: str):
+        coord = self.__tranform_coord(coord)
         self.__canvas.create_oval(coord.x, coord.y, coord.x, coord.y,
                                   width=Viewport.POINT_WIDTH, outline=color)
 
@@ -37,8 +37,8 @@ class Viewport:
         window_size_y = self.__window[1].y - self.__window[0].y
         # TODO: improve this (possibly next deploy)
         self.__window[1] = Coordinate2D(
-            self.__window[1].x + amount*window_size_x ,
-            self.__window[1].y + amount*window_size_y
+            self.__window[1].x + amount * window_size_x,
+            self.__window[1].y + amount * window_size_y
         )
 
     def __move_window(self, movement_vector: Coordinate2D):
@@ -54,8 +54,8 @@ class Viewport:
         v_min = self.__world_origin
 
         x = (coord.x - w_min.x) * (v_max.x - v_min.x) / (
-                    w_max.x - w_min.x)
-        y = (1 - (coord.y - w_min.y)  / (
+                w_max.x - w_min.x)
+        y = (1 - (coord.y - w_min.y) / (
                 w_max.y - w_min.y)) * (v_max.y - v_min.y)
         return Coordinate2D(x, y)
 
@@ -63,22 +63,15 @@ class Viewport:
         # TODO: not redraw all every time
         self.__canvas.delete('all')
         for displayable in display_file:
-            coordinates = displayable.get_coordinates()
-            for i in range(len(coordinates)):
-                # Transform coordinate
-                coord = self.__tranform_coord(coordinates[i])
-                
-                # Draw point
-                self.__draw_point(coord, displayable.get_color())
+            drawable = displayable.get_drawable()
+            lines = drawable.lines
+            points = drawable.points
+            if lines:
+                for line in lines:
+                    self.__draw_line(coord1=line[0], coord2=line[1], color=drawable.color)
 
-                # Draw line
-                if i < len(coordinates) - 1:
-                    next_coord = self.__tranform_coord(coordinates[i + 1])
-                    self.__draw_line(coord, next_coord, displayable.get_color())
-                else:
-                    if not isinstance(displayable, Dot) and not isinstance(displayable, Line):
-                        first_coord = self.__tranform_coord(coordinates[0])
-                        self.__draw_line(coord, first_coord, displayable.get_color())
+            for p in points:
+                self.__draw_point(p, color=drawable.color)
 
         self.__canvas.update()
 

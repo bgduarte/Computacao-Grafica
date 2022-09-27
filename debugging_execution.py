@@ -1,6 +1,8 @@
 from controller.controller import Controller
 from model.coordinate import Coordinate2D
 from model.wireframe import Wireframe
+from model.line import Line
+from model.dot import Dot
 
 
 class DebugHelper:
@@ -20,11 +22,23 @@ class DebugHelper:
             Coordinate2D(position.x + size, position.y + size),
             Coordinate2D(position.x , position.y + size),
         ]
-        square  = Wireframe(name = f'Square {self.__square_count}', coordinates=points)
+        square  = Wireframe(name = f'Square {self.__square_count}', coordinates=points, color='#000')
         self.__controller.observable_display_file.append(square)
         self.__square_count += 1
         return square
 
+    def create_dot(self, position: tuple):
+        coord = Coordinate2D(position[0], position[1])
+        dot = Dot(name="Dot1", color='#000', coordinates=[coord])
+        self.__controller.observable_display_file.append(dot)
+        return dot
+
+    def create_line(self, position: tuple, position2: tuple):
+        coord = Coordinate2D(position[0], position[1])
+        coord2 = Coordinate2D(position2[0], position2[1])
+        line = Line(name="Dot1", color='#000', coordinates=[coord, coord2])
+        self.__controller.observable_display_file.append(line)
+        return line
 
 def main():
     controller = Controller()
@@ -32,12 +46,8 @@ def main():
     ## Place what you want to test here (display doesn't update automatically,
     # you need to trigger by using the interface)
     square1 = helper.create_square(position=(100, 100), size=30)
-    square2 = helper.create_square(position=(100, 100), size=30)
-    square3 = helper.create_square(position=(100, 100), size=30)
-    square4 = helper.create_square(position=(100, 100), size=30)
-    square2.rotate_around_point(15, Coordinate2D(100, 100))
-    square3.rotate_around_point(30, Coordinate2D(100, 100))
-    square4.rotate_around_point(45, Coordinate2D(100, 100))
+    dot = helper.create_dot(position=(400,400))
+    line = helper.create_line((100,100), (300,250))
     #square2.scale_around_self(Coordinate2D(2, 2))
     #square2.translate(Coordinate2D(15, 0))
 

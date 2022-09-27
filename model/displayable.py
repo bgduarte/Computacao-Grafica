@@ -1,42 +1,60 @@
 from typing import List
 from model.coordinate import Coordinate2D
 from utils.matrix_helper import  MatrixHelper
-
+from dataclasses import dataclass
 
 # Abstract class
 class Displayable:
     # private attributes
-    __name: str
-    __color: str
-    __coordinates: List[Coordinate2D]
+    _name: str
+    _color: str
+    _coordinates: List[Coordinate2D]
+
+    @dataclass
+    class Drawable:
+        lines: List[List[Coordinate2D]]
+        points: List[Coordinate2D]
+        color: str
 
     def __init__(self, name: str, color: str, coordinates: List[Coordinate2D] = None) -> None:
         # color is '#rgb' or '#rrggbb'
-        self.__name = name
-        self.__color = color
-        self.__coordinates = coordinates
-        self.__constraint_check()
+        self._name = name
+        self._color = color
+        self._coordinates = coordinates
+        self._constraint_check()
         if not issubclass(type(self), Displayable):
             raise Exception("Displayable is an abstract class, it is not supposed to be instantiated")
 
     # public methods
     def add_coordinate(self, x, y):
-        self.__coordinates.append(Coordinate2D(x, y))
-        self.__constraint_check()
+        self._coordinates.append(Coordinate2D(x, y))
+        self._constraint_check()
 
     def get_coordinates(self) -> List[Coordinate2D]:
-        return self.__coordinates
+        return self._coordinates
     
     def get_name(self) -> str:
-        return self.__name
+        return self._name
     
     def get_color(self) -> str:
-        return self.__color
+        return self._color
     def set_color(self, color: str) -> None:
         # color is '#rgb' or '#rrggbb'
-        self.__color = color
+        self._color = color
 
-    def __constraint_check(self):
+    def get_drawable(self):
+        return Displayable.Drawable(
+            lines=self._get_drawable_lines(),
+            points=self._get__drawable_points(),
+            color=self._color)
+
+    def _get_drawable_lines(self):
+        pass #raise AbstractClassException()
+
+    def _get__drawable_points(self):
+        pass  #raise AbstractClassException()
+
+    def _constraint_check(self):
         pass
 
     def rotate(self, angle):
@@ -50,17 +68,17 @@ class Displayable:
 
     # Transforms polygon based on a list of transform operations, represented by matrices
     def transform(self, transformations_matrices: list):
-        for coord in self.__coordinates:
+        for coord in self._coordinates:
             coord.transform(transformations_matrices)
 
     def get_center_coord(self):
         sum_x = 0
         sum_y = 0
-        for coord in self.__coordinates:
+        for coord in self._coordinates:
             sum_x += coord.x
             sum_y += coord.y
 
-        l = float(len(self.__coordinates))
+        l = float(len(self._coordinates))
         return Coordinate2D(sum_x/l, sum_y/l)
 
     def rotate_around_self(self, angle: float): # angle in degrees
