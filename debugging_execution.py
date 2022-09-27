@@ -48,8 +48,9 @@ def main():
     square1 = helper.create_square(position=(100, 100), size=30)
     dot = helper.create_dot(position=(400,400))
     line = helper.create_line((100,100), (300,250))
-    #square2.scale_around_self(Coordinate2D(2, 2))
-    #square2.translate(Coordinate2D(15, 0))
+    square1.scale_around_self(Coordinate2D(2, 2))
+    square1.translate(Coordinate2D(15, 0))
+    square1.rotate_around_self(15)
 
     ##
     helper.run()

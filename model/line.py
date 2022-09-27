@@ -11,5 +11,5 @@ class Line(Displayable):
     def _get_drawable_lines(self):
         return [self._coordinates]
 
-    def _get__drawable_points(self):
+    def _get_drawable_points(self):
         return self._coordinates

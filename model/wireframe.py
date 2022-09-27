@@ -16,5 +16,5 @@ class Wireframe(Displayable):
             lines.append(line)
         return lines
 
-    def _get__drawable_points(self):
+    def _get_drawable_points(self):
         return self._coordinates
