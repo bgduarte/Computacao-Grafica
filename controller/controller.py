@@ -8,6 +8,7 @@ from typing import List, Literal
 from enum import Enum
 from model.coordinate import Coordinate2D
 from view.gui import Gui
+from utils.wavefront_file_descriptor import WavefrontFileDescriptor
 
 
 class Controller:
@@ -75,3 +76,11 @@ class Controller:
         elif relative_to == 'coordinate':
             displayable.rotate_around_point(angle, center)
         self.__viewport.draw(self.observable_display_file.displayables())
+
+    def import_wavefront_file(self, filepath: str) -> bool:
+        WavefrontFileDescriptor.import_file(filepath)
+        return True
+    
+    def export_wavefront_file(self) -> bool:
+        WavefrontFileDescriptor.export_file()
+        return True
