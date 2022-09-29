@@ -1,8 +1,8 @@
 from controller.controller import Controller
 from model.coordinate import Coordinate2D
-from model.wireframe import Wireframe
-from model.line import Line
-from model.dot import Dot
+from model.world_objects.displayables.wireframe import Wireframe
+from model.world_objects.displayables.line import Line
+from model.world_objects.displayables.dot import Dot
 
 
 class DebugHelper:
@@ -45,12 +45,12 @@ def main():
     helper = DebugHelper(controller)
     ## Place what you want to test here (display doesn't update automatically,
     # you need to trigger by using the interface)
-    square1 = helper.create_square(position=(100, 100), size=30)
-    dot = helper.create_dot(position=(400,400))
-    line = helper.create_line((100,100), (300,250))
-    square1.scale_around_self(Coordinate2D(2, 2))
-    square1.translate(Coordinate2D(15, 0))
-    square1.rotate_around_self(15)
+    #square1 = helper.create_square(position=(100, 100), size=30)
+    #dot = helper.create_dot(position=(400,400))
+    line = helper.create_line((100, 100), (200, 200))
+    #square1.scale_around_self(Coordinate2D(2, 2))
+    #square1.translate(Coordinate2D(15, 0))
+    #square1.rotate_around_self(15)
 
     ##
     helper.run()

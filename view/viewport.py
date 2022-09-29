@@ -46,15 +46,8 @@ class Viewport:
 
     def __tranform_coord(self, coord: Coordinate2D) -> Coordinate2D:
         # TODO: change this to happen on window (new part)
-        w_min = self.__window.bottom_left
-        w_max = self.__window.top_right
-        v_max = Coordinate2D(self.get_width(), self.get_height())
-        v_min = self.__world_origin
-
-        x = (coord.x - w_min.x) * (v_max.x - v_min.x) / (
-                w_max.x - w_min.x)
-        y = (1 - (coord.y - w_min.y) / (
-                w_max.y - w_min.y)) * (v_max.y - v_min.y)
+        x = (coord[0] + 1)*0.5*self.get_width()
+        y = (1 - (coord[1] + 1)*0.5) *self.get_height()
         return Coordinate2D(x, y)
 
     def get_window(self) -> Window:
@@ -66,16 +59,12 @@ class Viewport:
     def draw(self, display_file: List[Displayable]):
         # TODO: not redraw all every time
         self.__canvas.delete('all')
-        for displayable in display_file:
-            drawable = displayable.get_drawable()
-            lines = drawable.lines
-            points = drawable.points
-            if lines:
-                for line in lines:
-                    self.__draw_line(coord1=line[0], coord2=line[1], color=drawable.color)
+        drawableObject = self.__window.coord_to_window_system(display_file)
+        for line in drawableObject.lines:
+            self.__draw_line(line[0], line[1], color='#000')
 
-            for p in points:
-                self.__draw_point(p, color=drawable.color)
+        for p in drawableObject.points:
+            self.__draw_point(p, color='#000')
 
         self.__canvas.update()
 
