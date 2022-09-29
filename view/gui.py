@@ -1,11 +1,11 @@
 from __future__ import annotations
-from distutils import command
 from tkinter import *
+from tkinter import filedialog
+from tkinter.messagebox import askyesno, showinfo
 from tkinter.ttk import Notebook
-from turtle import width
 from typing import Callable, Final, List, Literal, Tuple, TYPE_CHECKING
 from model.coordinate import Coordinate2D
-from model.displayable import Displayable
+from model.world_objects.displayable import Displayable
 import re
 
 if TYPE_CHECKING:
@@ -73,6 +73,12 @@ class Gui:
                                     width=self.WIDTH / 4, height=self.HEIGHT * 4 / 6, borderwidth=2, relief=GROOVE)
         obj_list_frame.pack(padx=10, pady=10, side=TOP, anchor=W, fill=Y, expand=True)
         obj_list_frame.pack_propagate(False)
+
+        import_export_frame = Frame(obj_list_frame)
+        import_export_frame.pack(side=TOP, fill=X)
+        import_export_frame.grid_propagate(0)
+        import_btn = self.__create_button(import_export_frame, "Importar", self.__handle_import_btn, pady=6, padx=4, align=LEFT)
+        export_btn = self.__create_button(import_export_frame, "Exportar", self.__handle_export_btn, pady=6, padx=4, align=RIGHT)
 
         list_box = Listbox(obj_list_frame, listvariable=self.__obj_varlist, selectmode=SINGLE, bg="#fff")
         list_box.pack(pady=1, padx=4, side=TOP, anchor=W, fill=BOTH, expand=True)
@@ -243,6 +249,16 @@ class Gui:
         self.__create_navigation_frame(main_frame)
 
     # Handlers
+    def __handle_import_btn(self) -> None:
+        if askyesno(title="Atenção!", message="Essa ação sobrescreverá o Display File atual.\nProsseguir?"):
+            showinfo(title="Importante!", message="Certifique-se de que o arquivo de descrição de material (.mtl) está no mesmo diretório que o de objetos (.obj)")
+            filepath = filedialog.askopenfilename(title="Importar arquivo", initialdir='./', filetypes=[("Wavefront", ".obj")])
+            self.__controller.import_wavefront_file(filepath)
+
+    def __handle_export_btn(self) -> None:
+        self.__controller.export_wavefront_file()
+        showinfo(title="Exportado com sucesso!", message="Arquivo exportado com sucesso!\nDisponível em ./export/")
+    
     def __handle_remove_obj_btn(self, list_box: Listbox) -> None:
         if list_box.curselection() == (): return
         selected_idx, = list_box.curselection()

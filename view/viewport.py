@@ -1,8 +1,8 @@
 from tkinter import *
 from typing import List, Literal
-from model.displayable import Displayable
+from model.world_objects.displayable import Displayable
 from model.coordinate import Coordinate2D
-from model.window import Window
+from model.world_objects.window import Window
 
 
 class Viewport:
@@ -56,6 +56,12 @@ class Viewport:
         y = (1 - (coord.y - w_min.y) / (
                 w_max.y - w_min.y)) * (v_max.y - v_min.y)
         return Coordinate2D(x, y)
+
+    def get_window(self) -> Window:
+        return self.__window
+
+    def set_window(self, new_window: Window) -> None:
+        self.__window = new_window
 
     def draw(self, display_file: List[Displayable]):
         # TODO: not redraw all every time

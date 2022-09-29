@@ -1,6 +1,4 @@
-from typing import List, Tuple
-from model.displayable import Displayable
-from model.coordinate import Coordinate2D
+from model.world_objects.displayable import Displayable
 
 class Dot(Displayable):
     def _constraint_check(self):

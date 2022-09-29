@@ -1,12 +1,13 @@
 from view.viewport import Viewport
 from model.display_file import ObservableDisplayFile
-from model.displayable import Displayable
-from model.dot import Dot
-from model.wireframe import Wireframe
-from model.line import Line
+from model.world_objects.displayable import Displayable
+from model.world_objects.displayables.dot import Dot
+from model.world_objects.displayables.wireframe import Wireframe
+from model.world_objects.displayables.line import Line
 from typing import List, Literal
 from model.coordinate import Coordinate2D
 from view.gui import Gui
+from utils.wavefront_file_descriptor import WavefrontFileDescriptor
 
 
 class Controller:
@@ -74,3 +75,14 @@ class Controller:
         elif relative_to == 'coordinate':
             displayable.rotate_around_point(angle, center)
         self.__viewport.draw(self.observable_display_file.displayables())
+
+    def import_wavefront_file(self, filepath: str) -> None:
+        new_displayables, new_window = WavefrontFileDescriptor.import_file(filepath)
+        if new_window: self.__viewport.set_window(new_window)
+        self.observable_display_file.overwrite(new_displayables)
+    
+    def export_wavefront_file(self) -> None:
+        WavefrontFileDescriptor.export_file(
+            self.observable_display_file.displayables(),
+            self.__viewport.get_window()
+        )
