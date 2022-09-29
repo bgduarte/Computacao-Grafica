@@ -2,7 +2,7 @@ from __future__ import annotations
 from distutils import command
 from tkinter import *
 from tkinter import filedialog
-from tkinter.messagebox import showinfo
+from tkinter.messagebox import askyesno, showinfo
 from tkinter.ttk import Notebook
 from turtle import width
 from typing import Callable, Final, List, Literal, Tuple, TYPE_CHECKING
@@ -252,9 +252,10 @@ class Gui:
 
     # Handlers
     def __handle_import_btn(self) -> None:
-        showinfo(title="Importante!", message="Certifique-se de que o arquivo de descrição de material (.mtl) está no mesmo diretório que o de objetos (.obj)")
-        filepath = filedialog.askopenfilename(title="Importar arquivo", initialdir='./', filetypes=[("Wavefront", ".obj")])
-        self.__controller.import_wavefront_file(filepath)
+        if askyesno(title="Atenção!", message="Essa ação sobrescreverá o Display File atual.\nProsseguir?"):
+            showinfo(title="Importante!", message="Certifique-se de que o arquivo de descrição de material (.mtl) está no mesmo diretório que o de objetos (.obj)")
+            filepath = filedialog.askopenfilename(title="Importar arquivo", initialdir='./', filetypes=[("Wavefront", ".obj")])
+            self.__controller.import_wavefront_file(filepath)
 
     def __handle_export_btn(self) -> None:
         if self.__controller.export_wavefront_file():
