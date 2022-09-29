@@ -14,12 +14,16 @@ class Viewport:
     POINT_WIDTH = 5
 
     ZOOM_AMOUNT = 1.1
-    NAVIGATION_SPEED = 50
+    NAVIGATION_SPEED = 0.1#50
 
     def __init__(self, canvas: Canvas):
         self.__canvas = canvas
         self.__canvas.update()
-        self.__window = Window([Coordinate2D(0, 0), Coordinate2D(self.get_width(), self.get_height())])
+        self.__window = Window(
+            top_left=Coordinate2D(0, self.get_height()),
+            top_right=Coordinate2D(self.get_width(), self.get_height()),
+            bottom_left=Coordinate2D(0, 0)
+        )
         self.__world_origin = Coordinate2D(0, 0)
 
     def __draw_line(self, coord1: Coordinate2D, coord2: Coordinate2D, color: str):
@@ -42,8 +46,8 @@ class Viewport:
 
     def __tranform_coord(self, coord: Coordinate2D) -> Coordinate2D:
         # TODO: change this to happen on window (new part)
-        w_min = self.__window.get_coordinates()[0]
-        w_max = self.__window.get_coordinates()[1]
+        w_min = self.__window.bottom_left
+        w_max = self.__window.top_right
         v_max = Coordinate2D(self.get_width(), self.get_height())
         v_min = self.__world_origin
 
@@ -83,10 +87,10 @@ class Viewport:
 
     def navigate(self, direction: Literal['up', 'down', 'left', 'right']):
         if direction == 'up':
-            self.__move_window(Coordinate2D(0, Viewport.NAVIGATION_SPEED))
+            self.__move_window(Coordinate2D(0, Viewport.NAVIGATION_SPEED * self.__window.height))
         elif direction == 'down':
-            self.__move_window(Coordinate2D(0, -Viewport.NAVIGATION_SPEED))
+            self.__move_window(Coordinate2D(0, -Viewport.NAVIGATION_SPEED * self.__window.height))
         elif direction == 'left':
-            self.__move_window(Coordinate2D(-Viewport.NAVIGATION_SPEED, 0))
+            self.__move_window(Coordinate2D(-Viewport.NAVIGATION_SPEED * self.__window.width, 0))
         elif direction == 'right':
-            self.__move_window(Coordinate2D(Viewport.NAVIGATION_SPEED, 0))
+            self.__move_window(Coordinate2D(Viewport.NAVIGATION_SPEED * self.__window.width, 0))

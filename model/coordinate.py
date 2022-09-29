@@ -1,5 +1,7 @@
+import math
 from typing import List
 from utils.matrix_helper import MatrixHelper
+import numbers
 
 
 class Coordinate2D(List):
@@ -26,6 +28,10 @@ class Coordinate2D(List):
     def y(self, value: float):
         self[1] = value
 
+    @property
+    def length(self):
+        return math.sqrt(self.x*self.x + self.y*self.y)
+
     def __neg__(self):
         return Coordinate2D(-self.x, -self.y)
 
@@ -34,6 +40,15 @@ class Coordinate2D(List):
 
     def __sub__(self, other):
         return self.__add__(-other)
+
+    def __mul__(self, other):
+        if not isinstance(other, numbers.Number):
+            raise Exception(f'Coordinate can only be multiplied by numbers, not by {type(other)}')
+        return Coordinate2D(self.x*other, self.y*other)
+
+    @staticmethod
+    def distance(coord1, coord2):
+        return (coord2-coord1).length
 
     # Transforms coordinate based on a list of transform operations, represented by matrices
     def transform(self, transformations_matrices: list):
