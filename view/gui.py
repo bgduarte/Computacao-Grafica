@@ -113,13 +113,17 @@ class Gui:
             navigation_frame.rowconfigure(i, weight=1, uniform='r')
             navigation_frame.columnconfigure(i, weight=1, uniform='c')
 
-        Button(navigation_frame, text="Zoom Out", command=lambda: self.__handle_zoom('out')).grid(row=0, column=0)
-        Button(navigation_frame, text="Zoom In", command=lambda: self.__handle_zoom('in')).grid(row=0, column=2)
+        Button(navigation_frame, text="↶", command=lambda: self.__handle_rotate('left')).grid(row=0, column=0)
+        Button(navigation_frame, text="↷", command=lambda: self.__handle_rotate('right')).grid(row=0, column=2)
 
         Button(navigation_frame, text="↑", command=lambda: self.__handle_nav('up')).grid(row=0, column=1)
         Button(navigation_frame, text="←", command=lambda: self.__handle_nav('left')).grid(row=1, column=0)
         Button(navigation_frame, text="→", command=lambda: self.__handle_nav('right')).grid(row=1, column=2)
         Button(navigation_frame, text="↓", command=lambda: self.__handle_nav('down')).grid(row=2, column=1)
+
+        Button(navigation_frame, text="Zoom Out", command=lambda: self.__handle_zoom('out')).grid(row=2, column=0)
+        Button(navigation_frame, text="Zoom In", command=lambda: self.__handle_zoom('in')).grid(row=2, column=2)
+
 
         return navigation_frame
 
@@ -286,14 +290,16 @@ class Gui:
         selected_obj = self.__controller.observable_display_file[selected_idx]
         self.__create_action_obj_form(selected_obj)
 
+    def __handle_rotate(self, direction: Literal['left', 'right']) -> None:
+        self.__controller.rotate_window(direction)
+
     def __handle_nav(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
         self.__controller.navigate(direction)
 
     def __handle_zoom(self, direction: Literal['in', 'out']) -> None:
         self.__controller.zoom(direction)
 
-    def __add_coord_inputs(self, parent_frame: Frame, coords_inputs: List[Tuple[Entry, Entry]]) -> List[
-        Tuple[Entry, Entry]]:
+    def __add_coord_inputs(self, parent_frame: Frame, coords_inputs: List[Tuple[Entry, Entry]]) -> List[Tuple[Entry, Entry]]:
         inputs_frame = Frame(parent_frame)
         inputs_frame.pack(pady=10, fill=X)
         x_input = self.__create_input(inputs_frame, "x", padx=5, align=LEFT)
