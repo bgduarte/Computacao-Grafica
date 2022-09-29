@@ -78,8 +78,11 @@ class Controller:
 
     def import_wavefront_file(self, filepath: str) -> None:
         new_displayables, new_window = WavefrontFileDescriptor.import_file(filepath)
-        if new_window: self.__viewport.replace_window(new_window)
+        if new_window: self.__viewport.set_window(new_window)
         self.observable_display_file.overwrite(new_displayables)
     
-    def export_wavefront_file(self) -> bool:
-        return WavefrontFileDescriptor.export_file(self.observable_display_file.displayables())
+    def export_wavefront_file(self) -> None:
+        WavefrontFileDescriptor.export_file(
+            self.observable_display_file.displayables(),
+            self.__viewport.get_window()
+        )

@@ -256,10 +256,8 @@ class Gui:
             self.__controller.import_wavefront_file(filepath)
 
     def __handle_export_btn(self) -> None:
-        if self.__controller.export_wavefront_file():
-            showinfo(title="Exportado com sucesso!", message="Arquivo exportado com sucesso!\nDisponível em ./export/")
-        else:
-            showinfo(title="Erro!", message="Erro ao exportar arquivo!\nVerifique logs")
+        self.__controller.export_wavefront_file()
+        showinfo(title="Exportado com sucesso!", message="Arquivo exportado com sucesso!\nDisponível em ./export/")
     
     def __handle_remove_obj_btn(self, list_box: Listbox) -> None:
         if list_box.curselection() == (): return

@@ -53,7 +53,10 @@ class Viewport:
                 w_max.y - w_min.y)) * (v_max.y - v_min.y)
         return Coordinate2D(x, y)
 
-    def replace_window(self, new_window: Window) -> None:
+    def get_window(self) -> Window:
+        return self.__window
+
+    def set_window(self, new_window: Window) -> None:
         self.__window = new_window
 
     def draw(self, display_file: List[Displayable]):

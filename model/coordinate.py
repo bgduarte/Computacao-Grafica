@@ -54,3 +54,37 @@ class Coordinate2D(List):
 
     def scale(self, scale_vector):
         self.transform([MatrixHelper.scale_matrix(scale_vector)])
+
+
+class Coordinate3D(List):
+    # TODO: GENERALIZE COORDINATE CLASS
+    
+    def __init__(self, x, y: float = None, z: float = None):
+        if isinstance(x, list):
+            super(Coordinate3D, self).__init__(x)
+        else:
+            super(Coordinate3D, self).__init__([x, y, z])
+
+    @property
+    def x(self):
+        return self.__getitem__(0)
+
+    @x.setter
+    def x(self, value: float):
+        self[0] = value
+
+    @property
+    def y(self):
+        return self.__getitem__(1)
+
+    @y.setter
+    def y(self, value: float):
+        self[1] = value
+
+    @property
+    def z(self):
+        return self.__getitem__(2)
+
+    @z.setter
+    def z(self, value: float):
+        self[2] = value
