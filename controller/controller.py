@@ -7,7 +7,7 @@ from model.world_objects.displayables.line import Line
 from typing import List, Literal
 from model.coordinate import Coordinate2D
 from view.gui import Gui
-from utils.wavefront_file_descriptor import WavefrontFileDescriptor
+from utils.wavefront_file_parser import WavefrontFileParser
 
 
 class Controller:
@@ -77,12 +77,12 @@ class Controller:
         self.__viewport.draw(self.observable_display_file.displayables())
 
     def import_wavefront_file(self, filepath: str) -> None:
-        new_displayables, new_window = WavefrontFileDescriptor.import_file(filepath)
+        new_displayables, new_window = WavefrontFileParser.import_file(filepath)
         if new_window: self.__viewport.set_window(new_window)
         self.observable_display_file.overwrite(new_displayables)
     
     def export_wavefront_file(self) -> None:
-        WavefrontFileDescriptor.export_file(
+        WavefrontFileParser.export_file(
             self.observable_display_file.displayables(),
             self.__viewport.get_window()
         )
