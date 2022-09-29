@@ -37,7 +37,7 @@ class WavefrontFileDescriptor:
     """
 
     @staticmethod
-    def __parse_displayables(displayables: List[Displayable]) -> List[WavefrontObject]:
+    def __parse_displayables(displayables: List[Displayable]) -> Tuple[List[WavefrontObject], List[MaterialObject]]:
         # generate unique material objects
         materials_dict = dict.fromkeys([displayable.get_color() for displayable in displayables])
         for hex_color in materials_dict:
@@ -57,7 +57,7 @@ class WavefrontFileDescriptor:
                     vertices_idx=[]
                 )
             )
-        return w_objects
+        return w_objects, materials_dict.values()
 
     @staticmethod
     def __dump_material_file(materials: List[MaterialObject]) -> str:
@@ -113,6 +113,6 @@ class WavefrontFileDescriptor:
 
     @classmethod
     def export_file(cls, displayables: List[Displayable], window: Window) -> None:
-        objects = cls.__parse_displayables(displayables)
-        mtllib_filename = cls.__dump_material_file([obj.material for obj in objects])
+        objects, materials = cls.__parse_displayables(displayables)
+        mtllib_filename = cls.__dump_material_file(materials)
         cls.__dump_wavefront_file(objects, mtllib_filename)
