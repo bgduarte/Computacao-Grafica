@@ -1,6 +1,7 @@
+import math
+
 from model.world_object import WorldObject
 from model.coordinate import Coordinate2D
-from typing import List
 
 
 class Window(WorldObject):
@@ -30,9 +31,10 @@ class Window(WorldObject):
 
     # Returns the angle between the window up and the y-axis
     def _get_angle(self):
-        pass
+        y_axis: Coordinate2D = Coordinate2D.up()
+        w_up: Coordinate2D = self.top_left-self.bottom_left
+        return math.degrees(math.atan2(w_up.y*y_axis.x - w_up.x*y_axis.y, w_up.x*y_axis.x + w_up.y*y_axis.y))
 
     def _constraint_check(self):
         if len(self._coordinates) != 3:
             raise Exception("A window must have exactly 3 coordinates")
-

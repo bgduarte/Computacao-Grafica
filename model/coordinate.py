@@ -47,8 +47,12 @@ class Coordinate2D(List):
         return Coordinate2D(self.x*other, self.y*other)
 
     @staticmethod
-    def distance(coord1, coord2):
+    def distance(coord1, coord2) -> float:
         return (coord2-coord1).length
+
+    @staticmethod
+    def up():
+        return Coordinate2D(0, 1)
 
     # Transforms coordinate based on a list of transform operations, represented by matrices
     def transform(self, transformations_matrices: list):
