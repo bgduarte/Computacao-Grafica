@@ -1,6 +1,4 @@
-from typing import List
-from model.coordinate import Coordinate2D
-from model.displayable import Displayable
+from model.world_objects.displayable import Displayable
 
 
 class Line(Displayable):

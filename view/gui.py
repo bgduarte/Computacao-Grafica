@@ -1,13 +1,11 @@
 from __future__ import annotations
-from distutils import command
 from tkinter import *
 from tkinter import filedialog
 from tkinter.messagebox import askyesno, showinfo
 from tkinter.ttk import Notebook
-from turtle import width
 from typing import Callable, Final, List, Literal, Tuple, TYPE_CHECKING
 from model.coordinate import Coordinate2D
-from model.displayable import Displayable
+from model.world_objects.displayable import Displayable
 import re
 
 if TYPE_CHECKING:

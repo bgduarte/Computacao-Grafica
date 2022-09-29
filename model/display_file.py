@@ -1,5 +1,5 @@
-from typing import Any, Callable, Dict, List
-from model.displayable import Displayable
+from typing import Any, Callable, List
+from model.world_objects.displayable import Displayable
 
 
 # A "observable" that holds displayables
@@ -44,4 +44,9 @@ class ObservableDisplayFile:
         return self.__displayables
 
     def displayables(self) -> List[Displayable]:
+        return self.__displayables
+    
+    def overwrite(self, new_list: List[Displayable]) -> List[Displayable]:
+        self.__displayables = new_list
+        self.__notify_observers()
         return self.__displayables
