@@ -22,7 +22,6 @@ class Displayable(WorldObject):
         super().__init__(coordinates=coordinates)
         self._name = name
         self._color = color
-        self._constraint_check()
         if not issubclass(type(self), Displayable):
             raise Exception("Displayable is an abstract class, it is not supposed to be instantiated")
     
