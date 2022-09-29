@@ -5,7 +5,6 @@ from model.dot import Dot
 from model.wireframe import Wireframe
 from model.line import Line
 from typing import List, Literal
-from enum import Enum
 from model.coordinate import Coordinate2D
 from view.gui import Gui
 from utils.wavefront_file_descriptor import WavefrontFileDescriptor

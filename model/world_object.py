@@ -9,6 +9,7 @@ class WorldObject(ABC):
 
     def __init__(self, coordinates: List[Coordinate2D]) -> None:
         self._coordinates = coordinates
+        self._constraint_check()
 
     def add_coordinate(self, x, y):
         self._coordinates.append(Coordinate2D(x, y))

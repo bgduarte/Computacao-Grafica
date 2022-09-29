@@ -2,23 +2,24 @@ from tkinter import *
 from typing import List, Literal
 from model.displayable import Displayable
 from model.coordinate import Coordinate2D
+from model.window import Window
 
 
 class Viewport:
     __canvas: Canvas
-    __window: List[Coordinate2D]
+    __window: Window
     __world_origin: Coordinate2D
 
     LINE_WIDTH = 3
     POINT_WIDTH = 5
 
-    ZOOM_AMOUNT = 0.1
+    ZOOM_AMOUNT = 1.1
     NAVIGATION_SPEED = 50
 
     def __init__(self, canvas: Canvas):
         self.__canvas = canvas
         self.__canvas.update()
-        self.__window = [Coordinate2D(0, 0), Coordinate2D(self.get_width(), self.get_height())]
+        self.__window = Window([Coordinate2D(0, 0), Coordinate2D(self.get_width(), self.get_height())])
         self.__world_origin = Coordinate2D(0, 0)
 
     def __draw_line(self, coord1: Coordinate2D, coord2: Coordinate2D, color: str):
@@ -33,23 +34,16 @@ class Viewport:
                                   width=Viewport.POINT_WIDTH, outline=color)
 
     def __zoom(self, amount: float):
-        window_size_x = self.__window[1].x - self.__window[0].x
-        window_size_y = self.__window[1].y - self.__window[0].y
-        # TODO: improve this (possibly next deploy)
-        self.__window[1] = Coordinate2D(
-            self.__window[1].x + amount * window_size_x,
-            self.__window[1].y + amount * window_size_y
-        )
+        # Add option to zoom irregularly in interface (different x t ammount)
+        self.__window.scale_around_self(Coordinate2D(amount, amount))
 
     def __move_window(self, movement_vector: Coordinate2D):
-        self.__window[0].x += movement_vector.x
-        self.__window[0].y += movement_vector.y
-        self.__window[1].x += movement_vector.x
-        self.__window[1].y += movement_vector.y
+        self.__window.translate(movement_vector)
 
     def __tranform_coord(self, coord: Coordinate2D) -> Coordinate2D:
-        w_min = self.__window[0]
-        w_max = self.__window[1]
+        # TODO: change this to happen on window (new part)
+        w_min = self.__window.get_coordinates()[0]
+        w_max = self.__window.get_coordinates()[1]
         v_max = Coordinate2D(self.get_width(), self.get_height())
         v_min = self.__world_origin
 
@@ -82,7 +76,7 @@ class Viewport:
         return self.__canvas.winfo_height()
 
     def zoom_in(self) -> None:
-        self.__zoom(-Viewport.ZOOM_AMOUNT)
+        self.__zoom(1/Viewport.ZOOM_AMOUNT)
 
     def zoom_out(self) -> None:
         self.__zoom(Viewport.ZOOM_AMOUNT)
