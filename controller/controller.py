@@ -77,8 +77,9 @@ class Controller:
         self.__viewport.draw(self.observable_display_file.displayables())
 
     def rotate_window(self, direction: Literal['left', 'right']) -> None:
-        angle = 30 # sei lá, com um angulo fixo fica simples
-        # TODO: LINK ROTATE WINDOW
+        self.__viewport.rotate_window(direction)
+        self.__viewport.draw(self.observable_display_file.displayables())
+
 
     def import_wavefront_file(self, filepath: str) -> None:
         new_displayables, new_window = WavefrontFileParser.import_file(filepath)

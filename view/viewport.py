@@ -14,7 +14,8 @@ class Viewport:
     POINT_WIDTH = 5
 
     ZOOM_AMOUNT = 1.1
-    NAVIGATION_SPEED = 0.1#50
+    NAVIGATION_SPEED = 0.1
+    WINDOW_ROTATION_AMOUNT = 15
 
     def __init__(self, canvas: Canvas):
         self.__canvas = canvas
@@ -41,9 +42,6 @@ class Viewport:
         # Add option to zoom irregularly in interface (different x t ammount)
         self.__window.scale_around_self(Coordinate2D(amount, amount))
 
-    def __move_window(self, movement_vector: Coordinate2D):
-        self.__window.translate(movement_vector)
-
     def __tranform_coord(self, coord: Coordinate2D) -> Coordinate2D:
         # TODO: change this to happen on window (new part)
         x = (coord[0] + 1)*0.5*self.get_width()
@@ -64,7 +62,7 @@ class Viewport:
             self.__draw_line(line[0], line[1], color='#000')
 
         for p in drawableObject.points:
-            self.__draw_point(p, color='#000')
+            self.__draw_point(p, color='#000') # TODO: fix colors
 
         self.__canvas.update()
 
@@ -81,11 +79,16 @@ class Viewport:
         self.__zoom(Viewport.ZOOM_AMOUNT)
 
     def navigate(self, direction: Literal['up', 'down', 'left', 'right']):
+        amount =  Viewport.NAVIGATION_SPEED
         if direction == 'up':
-            self.__move_window(Coordinate2D(0, Viewport.NAVIGATION_SPEED * self.__window.height))
+            self.__window.move_up(amount)
         elif direction == 'down':
-            self.__move_window(Coordinate2D(0, -Viewport.NAVIGATION_SPEED * self.__window.height))
+            self.__window.move_down(amount)
         elif direction == 'left':
-            self.__move_window(Coordinate2D(-Viewport.NAVIGATION_SPEED * self.__window.width, 0))
+            self.__window.move_left(amount)
         elif direction == 'right':
-            self.__move_window(Coordinate2D(Viewport.NAVIGATION_SPEED * self.__window.width, 0))
+            self.__window.move_right(amount)
+
+    def rotate_window(self, direction: Literal['left', 'right']):
+        amount = Viewport.WINDOW_ROTATION_AMOUNT if direction == 'left' else -Viewport.WINDOW_ROTATION_AMOUNT
+        self.__window.rotate_around_point(amount, self.__window.get_window_center())

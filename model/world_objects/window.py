@@ -48,18 +48,36 @@ class Window(WorldObject):
     def width(self) -> float:
         return Coordinate2D.distance(self.top_left, self.top_right)
 
+    def move_left(self, amount):
+        movement_vector = -(self.top_right - self.top_left).normalize() * amount * self.width
+        self.translate(movement_vector)
+
+    def move_right(self, amount):
+        movement_vector = (self.top_right - self.top_left).normalize() * amount * self.width
+        self.translate(movement_vector)
+
+    def move_up(self, amount):
+        movement_vector = -(self.bottom_left - self.top_left).normalize() * amount * self.height
+        self.translate(movement_vector)
+
+    def move_down(self, amount):
+        movement_vector = (self.bottom_left - self.top_left).normalize() * amount * self.height
+        self.translate(movement_vector)
+
     # Returns the angle between the window up and the y-axis
     def _get_angle(self):
         y_axis: Coordinate2D = Coordinate2D.up()
         w_up: Coordinate2D = self.top_left-self.bottom_left
+        # TODO: change this approach
         return math.degrees(math.atan2(w_up.y*y_axis.x - w_up.x*y_axis.y, w_up.x*y_axis.x + w_up.y*y_axis.y))
 
     def _transform_coord(self, coord: Coordinate2D):
         new_point = Coordinate2D(coord.copy())
         new_point.translate(-self.get_window_center())
-        new_point.rotate(-self._get_angle())
+        new_point.rotate(self._get_angle())
         new_point.x = new_point.x / (self.width * 0.5)
         new_point.y = new_point.y / (self.height * 0.5)
+        print(self._get_angle())
         return new_point
 
     def get_window_center(self) -> Coordinate2D:

@@ -46,6 +46,9 @@ class Coordinate2D(List):
             raise Exception(f'Coordinate can only be multiplied by numbers, not by {type(other)}')
         return Coordinate2D(self.x*other, self.y*other)
 
+    def normalize(self):
+        return Coordinate2D(self.x/self.length, self.y/self.length)
+
     @staticmethod
     def distance(coord1, coord2) -> float:
         return (coord2-coord1).length
