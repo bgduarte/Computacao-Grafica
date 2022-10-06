@@ -9,12 +9,13 @@ class Viewport:
     __canvas: Canvas
     __window: Window
     __world_origin: Coordinate2D
+    __border_width = 50
 
     LINE_WIDTH = 3
     POINT_WIDTH = 5
 
     ZOOM_AMOUNT = 1.1
-    NAVIGATION_SPEED = 0.1
+    NAVIGATION_SPEED = 0.07
     WINDOW_ROTATION_AMOUNT = 15
 
     def __init__(self, canvas: Canvas):
@@ -27,11 +28,43 @@ class Viewport:
         )
         self.__world_origin = Coordinate2D(0, 0)
 
-    def __draw_line(self, coord1: Coordinate2D, coord2: Coordinate2D, color: str):
+    def __draw_viewport(self):
+        # draw bottom
+        self.__draw_line(
+            Coordinate2D(-1, -1),
+            Coordinate2D(1, -1),
+            '#f00',
+            1
+        )
+        # draw top
+        self.__draw_line(
+            Coordinate2D(-1, 1),
+            Coordinate2D(1, 1),
+            '#f00',
+            1
+        )
+        # draw left
+        self.__draw_line(
+            Coordinate2D(-1, 1),
+            Coordinate2D(-1, -1),
+            '#f00',
+            1
+        )
+        # draw right
+        self.__draw_line(
+            Coordinate2D(1, 1),
+            Coordinate2D(1, -1),
+            '#f00',
+            1
+        )
+
+    def __draw_line(self, coord1: Coordinate2D, coord2: Coordinate2D, color: str, line_width: int = None):
+        if not line_width:
+            line_width = Viewport.LINE_WIDTH
         coord1 = self.__tranform_coord(coord1)
         coord2 = self.__tranform_coord(coord2)
         self.__canvas.create_line(coord1.x, coord1.y, coord2.x, coord2.y,
-                                  width=Viewport.LINE_WIDTH, fill=color)
+                                  width=line_width, fill=color)
 
     def __draw_point(self, coord: Coordinate2D, color: str):
         coord = self.__tranform_coord(coord)
@@ -43,9 +76,10 @@ class Viewport:
         self.__window.scale_around_self(Coordinate2D(amount, amount))
 
     def __tranform_coord(self, coord: Coordinate2D) -> Coordinate2D:
-        # TODO: change this to happen on window (new part)
         x = (coord[0] + 1)*0.5*self.get_width()
         y = (1 - (coord[1] + 1)*0.5) *self.get_height()
+        x += self.__border_width
+        y += self.__border_width
         return Coordinate2D(x, y)
 
     def get_window(self) -> Window:
@@ -57,6 +91,7 @@ class Viewport:
     def draw(self, display_file: List[Displayable]):
         # TODO: not redraw all every time
         self.__canvas.delete('all')
+        self.__draw_viewport()
         drawableObject = self.__window.coord_to_window_system(display_file)
         for line in drawableObject.lines:
             self.__draw_line(line[0], line[1], color='#000')
@@ -67,10 +102,10 @@ class Viewport:
         self.__canvas.update()
 
     def get_width(self) -> int:
-        return self.__canvas.winfo_width()
+        return self.__canvas.winfo_width() - 2*self.__border_width ## TODO: remove the division after testing the clipping
 
     def get_height(self) -> int:
-        return self.__canvas.winfo_height()
+        return self.__canvas.winfo_height() - 2*self.__border_width ## TODO: remove the division after testing the clipping
 
     def zoom_in(self) -> None:
         self.__zoom(1/Viewport.ZOOM_AMOUNT)

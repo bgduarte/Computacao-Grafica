@@ -4,12 +4,21 @@ from typing import List
 from model.world_object import WorldObject
 from model.coordinate import Coordinate2D
 from model.world_objects.displayable import Displayable
+from utils.clipper import Clipper
 
 
 class Window(WorldObject):
 
     def __init__(self, top_left: Coordinate2D, top_right: Coordinate2D, bottom_left: Coordinate2D):
         super().__init__(coordinates=[top_left, top_right, bottom_left])
+
+    def clip_line(self, line: List[Coordinate2D]):
+        print(f'Before: {line}')
+        print(f'After: {Clipper.liang_barsky_clip(line[0], line[1])}')
+        return Clipper.liang_barsky_clip(line[0], line[1])
+
+    def clip_point(self, point: Coordinate2D):
+        return point if point.x >= -1 and point.x <= 1 and point.y >= -1 and point.y <= 1 else None
 
     def coord_to_window_system(self, displayables: List[Displayable]):
         displayables_copy = displayables.copy()
@@ -18,13 +27,20 @@ class Window(WorldObject):
         for displayable in displayables_copy:
             drawable = displayable.get_drawable()
             for p in drawable.points:
-                points.append(self._transform_coord(p))
+                new_point = self._transform_coord(p)
+                new_point = self.clip_point(new_point)
+                if new_point:
+                    points.append(new_point)
+
 
             for line in drawable.lines:
-                lines.append([
+                transformed_line = [
                     self._transform_coord(line[0]),
                     self._transform_coord(line[1])
-                    ])
+                    ]
+                clipped_line = self.clip_line(transformed_line)
+                if clipped_line:
+                    lines.append(clipped_line)
 
         return Displayable.Drawable(lines=lines, points=points, color='#000')
 
@@ -77,7 +93,6 @@ class Window(WorldObject):
         new_point.rotate(self._get_angle())
         new_point.x = new_point.x / (self.width * 0.5)
         new_point.y = new_point.y / (self.height * 0.5)
-        print(self._get_angle())
         return new_point
 
     def get_window_center(self) -> Coordinate2D:

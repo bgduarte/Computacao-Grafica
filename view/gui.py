@@ -20,7 +20,7 @@ class Gui:
     WIDTH: Final[int] = 1280
     HEIGHT: Final[int] = 720
 
-    CANVAS_WIDTH: Final[int] = WIDTH * 3 / 4
+    CANVAS_WIDTH: Final[int] = WIDTH * 3 / 4 # TODO:Not using these???
     CANVAS_HEIGHT: Final[int] = HEIGHT * 2 / 6
 
     ### Private attrs
