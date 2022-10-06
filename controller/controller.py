@@ -31,7 +31,10 @@ class Controller:
     def __on_display_file_change(self, display_file: List[Displayable]) -> None:
         self.__viewport.draw(display_file)
 
-    ### Public methods
+    ### Public methods    
+    def set_clipping_method(self, method: Literal['liang_barsky']):
+        self.__viewport.set_clipping_method(method)
+
     def run(self):
         self.__create_interface()
         self.__gui.run()

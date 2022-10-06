@@ -27,6 +27,7 @@ class Viewport:
             bottom_left=Coordinate2D(0, 0)
         )
         self.__world_origin = Coordinate2D(0, 0)
+        self.__draw_viewport()
 
     def __draw_viewport(self):
         lines = [(-1, -1, 1, -1), (-1, 1, 1, 1), (-1, 1, -1, -1), (1, 1, 1, -1)]
@@ -61,6 +62,9 @@ class Viewport:
         y += self.__border_width
         return Coordinate2D(x, y)
 
+    def set_clipping_method(self, method: Literal['liang_barsky']):
+        self.__window.set_clipping_method(method)
+
     def get_window(self) -> Window:
         return self.__window
 
@@ -71,16 +75,9 @@ class Viewport:
         # TODO: not redraw all every time
         self.__canvas.delete('all')
         self.__draw_viewport()
-        
-        # drawableObject = self.__window.coord_to_window_system(display_file)
-        # for line in drawableObject.lines:
-        #     self.__draw_line(line[0], line[1], color='#000')
-        # for p in drawableObject.points:
-        #     self.__draw_point(p, color='#000') # TODO: fix colors
-
         for displayable in display_file:
             drawable = self.__window.coord_to_window_system(displayable.get_drawable())
-            drawable = self.__window.clip(drawable, 'liang_barsky')
+            drawable = self.__window.clip(drawable)
             for point in drawable.points:
                 self.__draw_point(point, drawable.color)
             for line in drawable.lines:
