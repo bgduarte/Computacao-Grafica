@@ -32,7 +32,7 @@ class Controller:
         self.__viewport.draw(display_file)
 
     ### Public methods    
-    def set_clipping_method(self, method: Literal['liang_barsky']):
+    def set_clipping_method(self, method: Literal['liang_barsky', 'cohen_sutherland']):
         self.__viewport.set_clipping_method(method)
 
     def run(self):

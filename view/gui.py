@@ -134,12 +134,12 @@ class Gui:
         clipping_frame.grid_propagate(0)
 
         clipping_method = StringVar()
-        clipping_method.set('liang_barsky')
+        clipping_method.set('cohen_sutherland')
+        Radiobutton(clipping_frame, text='Cohen-Sutherland', variable=clipping_method, value='cohen_sutherland',
+                        command=lambda: self.__on_clipping_method_change(clipping_method.get())).pack(anchor=W, pady=6)
         Radiobutton(clipping_frame, text='Liang-Barsky', variable=clipping_method, value='liang_barsky',
                         command=lambda: self.__on_clipping_method_change(clipping_method.get())).pack(anchor=W, pady=6)
-        Radiobutton(clipping_frame, text='Outro', variable=clipping_method, value='outro',
-                        command=lambda: self.__on_clipping_method_change(clipping_method.get())).pack(anchor=W, pady=6)
-
+        self.__on_clipping_method_change(clipping_method.get())
 
     def __create_add_obj_form(self) -> None:
         form = Toplevel(self.__root)

@@ -62,7 +62,7 @@ class Viewport:
         y += self.__border_width
         return Coordinate2D(x, y)
 
-    def set_clipping_method(self, method: Literal['liang_barsky']):
+    def set_clipping_method(self, method: Literal['liang_barsky', 'cohen_sutherland']):
         self.__window.set_clipping_method(method)
 
     def get_window(self) -> Window:
@@ -82,7 +82,7 @@ class Viewport:
                 self.__draw_point(point, drawable.color)
             for line in drawable.lines:
                 self.__draw_line(line[0], line[1], drawable.color)
-
+            # TODO: FILL OBJECTS WITH COLOR
         self.__canvas.update()
 
     def get_width(self) -> int:

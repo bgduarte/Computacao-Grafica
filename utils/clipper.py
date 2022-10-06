@@ -70,7 +70,6 @@ class Clipper:
                 code |= BOTTOM
             elif p.y > w_max.y:
                 code |= TOP
-
             return code
 
         x1, x2 = point1.x, point2.x
@@ -88,7 +87,7 @@ class Clipper:
             elif r_code1 & r_code2: # line outside
                 break
             else:
-                out_code = r_code2 if r_code2 > r_code2 else r_code1
+                out_code = r_code2 if r_code2 > r_code1 else r_code1
                 x, y = None, None
                 if out_code & TOP:
                     x = x1 + (x2 - x1) * (w_max.y - y1) / (y2 - y1)
@@ -102,14 +101,12 @@ class Clipper:
                 elif out_code & LEFT:
                     y = y1 + (y2 - y1) * (w_min.x - x1) / (x2 - x1)
                     x = w_min.x
-
+                
                 if out_code == r_code1:
-                    x1 = x
-                    y1 = y
+                    x1, y1 = x, y
                     r_code1 = to_region_code(Coordinate2D(x1, y1))
                 else:
-                    x2 = x
-                    y2 = y
+                    x2, y2 = x, y
                     r_code2 = to_region_code(Coordinate2D(x2, y2))
 
-        return Coordinate2D(x1, y1), Coordinate2D(x2, y2) if accept else None
+        return (Coordinate2D(x1, y1), Coordinate2D(x2, y2)) if accept else None
