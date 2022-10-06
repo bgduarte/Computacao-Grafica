@@ -1,5 +1,5 @@
 import math
-from typing import List
+from typing import List, Literal, Tuple, Union
 
 from model.world_object import WorldObject
 from model.coordinate import Coordinate2D
@@ -12,37 +12,44 @@ class Window(WorldObject):
     def __init__(self, top_left: Coordinate2D, top_right: Coordinate2D, bottom_left: Coordinate2D):
         super().__init__(coordinates=[top_left, top_right, bottom_left])
 
-    def clip_line(self, line: List[Coordinate2D]):
-        print(f'Before: {line}')
-        print(f'After: {Clipper.liang_barsky_clip(line[0], line[1])}')
+    def clip_line(self, line: List[Coordinate2D], method: Literal['liang_barsky']) -> Union[Tuple[Coordinate2D, Coordinate2D], None]:
         return Clipper.liang_barsky_clip(line[0], line[1])
 
-    def clip_point(self, point: Coordinate2D):
+    def clip_point(self, point: Coordinate2D) -> Union[Coordinate2D, None]:
         return point if point.x >= -1 and point.x <= 1 and point.y >= -1 and point.y <= 1 else None
 
-    def coord_to_window_system(self, displayables: List[Displayable]):
-        displayables_copy = displayables.copy()
-        lines = []
-        points = []
-        for displayable in displayables_copy:
-            drawable = displayable.get_drawable()
-            for p in drawable.points:
-                new_point = self._transform_coord(p)
-                new_point = self.clip_point(new_point)
-                if new_point:
-                    points.append(new_point)
+    # def coord_to_window_system(self, displayables: List[Displayable]):
+    #     displayables_copy = displayables.copy()
+    #     lines = []
+    #     points = []
+    #     for displayable in displayables_copy:
+    #         drawable = displayable.get_drawable()
+    #         for p in drawable.points:
+    #             new_point = self._transform_coord(p)
+    #             new_point = self.clip_point(new_point)
+    #             if new_point:
+    #                 points.append(new_point)
+    #         for line in drawable.lines:
+    #             transformed_line = [
+    #                 self._transform_coord(line[0]),
+    #                 self._transform_coord(line[1])
+    #             ]
+    #             clipped_line = self.clip_line(transformed_line)
+    #             if clipped_line:
+    #                 lines.append(clipped_line)
+    #     return Displayable.Drawable(lines=lines, points=points, color='#000')
+    
+    def coord_to_window_system(self, drawable: Displayable.Drawable) -> Displayable.Drawable:
+        points = [self._transform_coord(p) for p in drawable.points]
+        lines = [[self._transform_coord(line[0]), self._transform_coord(line[1])] for line in drawable.lines]
+        return Displayable.Drawable(lines, points, drawable.color)
 
 
-            for line in drawable.lines:
-                transformed_line = [
-                    self._transform_coord(line[0]),
-                    self._transform_coord(line[1])
-                    ]
-                clipped_line = self.clip_line(transformed_line)
-                if clipped_line:
-                    lines.append(clipped_line)
-
-        return Displayable.Drawable(lines=lines, points=points, color='#000')
+    def clip(self, drawable: Displayable.Drawable, method: Literal['liang_barsky']) -> Displayable.Drawable:
+        # applies clipping and appends if clipped is not null
+        points = [clipped_p for p in drawable.points if (clipped_p := self.clip_point(p)) is not None]
+        lines = [clipped_l for line in drawable.lines if (clipped_l := self.clip_line(line, method)) is not None]
+        return Displayable.Drawable(lines, points, drawable.color)
 
     @property
     def top_left(self) -> Coordinate2D:

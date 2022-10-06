@@ -29,38 +29,17 @@ class Viewport:
         self.__world_origin = Coordinate2D(0, 0)
 
     def __draw_viewport(self):
-        # draw bottom
-        self.__draw_line(
-            Coordinate2D(-1, -1),
-            Coordinate2D(1, -1),
-            '#f00',
-            1
-        )
-        # draw top
-        self.__draw_line(
-            Coordinate2D(-1, 1),
-            Coordinate2D(1, 1),
-            '#f00',
-            1
-        )
-        # draw left
-        self.__draw_line(
-            Coordinate2D(-1, 1),
-            Coordinate2D(-1, -1),
-            '#f00',
-            1
-        )
-        # draw right
-        self.__draw_line(
-            Coordinate2D(1, 1),
-            Coordinate2D(1, -1),
-            '#f00',
-            1
-        )
+        lines = [(-1, -1, 1, -1), (-1, 1, 1, 1), (-1, 1, -1, -1), (1, 1, 1, -1)]
+        for x1, y1, x2, y2 in lines:
+            self.__draw_line(
+                Coordinate2D(x1, y1),
+                Coordinate2D(x2, y2),
+                '#f00',
+                1
+            )
 
     def __draw_line(self, coord1: Coordinate2D, coord2: Coordinate2D, color: str, line_width: int = None):
-        if not line_width:
-            line_width = Viewport.LINE_WIDTH
+        if not line_width: line_width = Viewport.LINE_WIDTH
         coord1 = self.__tranform_coord(coord1)
         coord2 = self.__tranform_coord(coord2)
         self.__canvas.create_line(coord1.x, coord1.y, coord2.x, coord2.y,
@@ -92,12 +71,20 @@ class Viewport:
         # TODO: not redraw all every time
         self.__canvas.delete('all')
         self.__draw_viewport()
-        drawableObject = self.__window.coord_to_window_system(display_file)
-        for line in drawableObject.lines:
-            self.__draw_line(line[0], line[1], color='#000')
+        
+        # drawableObject = self.__window.coord_to_window_system(display_file)
+        # for line in drawableObject.lines:
+        #     self.__draw_line(line[0], line[1], color='#000')
+        # for p in drawableObject.points:
+        #     self.__draw_point(p, color='#000') # TODO: fix colors
 
-        for p in drawableObject.points:
-            self.__draw_point(p, color='#000') # TODO: fix colors
+        for displayable in display_file:
+            drawable = self.__window.coord_to_window_system(displayable.get_drawable())
+            drawable = self.__window.clip(drawable, 'liang_barsky')
+            for point in drawable.points:
+                self.__draw_point(point, drawable.color)
+            for line in drawable.lines:
+                self.__draw_line(line[0], line[1], drawable.color)
 
         self.__canvas.update()
 
