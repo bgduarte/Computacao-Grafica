@@ -11,6 +11,7 @@ class Window(WorldObject):
     __clipping_method: Literal['liang_barsky']
 
     def __init__(self, top_left: Coordinate2D, top_right: Coordinate2D, bottom_left: Coordinate2D):
+        self.__clipping_method = 'liang_barsky'
         super().__init__(coordinates=[top_left, top_right, bottom_left])
 
     def clip_line(self, line: List[Coordinate2D]) -> Union[Tuple[Coordinate2D, Coordinate2D], None]:
