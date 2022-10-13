@@ -19,6 +19,19 @@ class MatrixHelper: # TODO: Generalize to 3D+ support
         return [sum(starmap(mul, zip(vector, col))) for col in zip(*matrix)]
 
     @staticmethod
+    def mul(a: List[List[float]], b: List[List[float]]) -> List[List[float]]:
+        c = []
+        for i in range(0, len(a)):
+            temp = []
+            for j in range(0, len(b[0])):
+                s = 0
+                for k in range(0, len(a[0])):
+                    s += a[i][k] * b[k][j]
+                temp.append(s)
+            c.append(temp)
+        return c
+
+    @staticmethod
     # Receives a vector that represents the translation, returns a matrix to apply that operation
     def translation_matrix(v: Coordinate2D) -> List[List[float]]:
         return [

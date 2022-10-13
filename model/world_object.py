@@ -53,7 +53,7 @@ class WorldObject(ABC):
         center_coord = self.get_center_coord()
         self.transform([
             # Translate to origin
-            MatrixHelper.translation_matrix(-center_coord),  # TODO: investigate translation backwards
+            MatrixHelper.translation_matrix(-center_coord),
             # Scale
             MatrixHelper.scale_matrix(scale_vector),
             # Translate back to the same position

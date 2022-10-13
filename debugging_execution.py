@@ -3,6 +3,9 @@ from model.coordinate import Coordinate2D
 from model.world_objects.displayables.wireframe import Wireframe
 from model.world_objects.displayables.line import Line
 from model.world_objects.displayables.dot import Dot
+from model.world_objects.displayables.bezier_curve import BezierCurve
+from typing import List
+
 
 
 class DebugHelper:
@@ -40,6 +43,12 @@ class DebugHelper:
         self.__controller.observable_display_file.append(line)
         return line
 
+    def create_bezier_curve(self, coords: List[Coordinate2D]):
+        curve = BezierCurve(coordinates=coords, name="Curve", color='#000')
+        self.__controller.observable_display_file.append(curve)
+        return curve
+
+
 def main():
     controller = Controller()
     helper = DebugHelper(controller)
@@ -47,6 +56,17 @@ def main():
     # you need to trigger by using the interface)
     #square1 = helper.create_square(position=(100, 100), size=30)
     #dot = helper.create_dot(position=(400,400))
+    curve = helper.create_bezier_curve([
+        Coordinate2D(100,0),
+        Coordinate2D(100, 100),
+        Coordinate2D(0,100),
+        Coordinate2D(0, 0),
+        Coordinate2D(-10, -10),
+        Coordinate2D(0, -100),
+        Coordinate2D(-100, -70),
+        Coordinate2D(-30, 0),
+
+    ])
     line = helper.create_line((100, 100), (100, 200))
     #square1.scale_around_self(Coordinate2D(2, 2))
     #square1.translate(Coordinate2D(15, 0))
