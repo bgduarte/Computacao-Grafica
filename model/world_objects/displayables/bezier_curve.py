@@ -6,12 +6,16 @@ from model.coordinate import Coordinate2D
 class BezierCurve(Curve):
     def _constraint_check(self):
         length = len(self._coordinates)
+        for i in range(3, len(self._coordinates)-1, 4):
+            if self._coordinates[i] != self._coordinates[i+1]:
+                raise Exception("Curves not connected")
+
         if length % 4 != 0 or length < 4:
             raise Exception("A bezier curve must have a least 4 points, "
                             "and the number of points must be multiple of 4")
 
     def _get_drawable_points(self):
-        return [self._coordinates[0], self._coordinates[-1]]
+        return self._coordinates[::4] + [self._coordinates[-1]]
 
     def _get_method_matrix(self):
         return [

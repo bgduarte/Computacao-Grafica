@@ -61,7 +61,7 @@ def main():
         Coordinate2D(100, 100),
         Coordinate2D(0,100),
         Coordinate2D(0, 0),
-        Coordinate2D(-10, -10),
+        Coordinate2D(0, 0),
         Coordinate2D(0, -100),
         Coordinate2D(-100, -70),
         Coordinate2D(-30, 0),
