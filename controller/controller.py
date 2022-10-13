@@ -4,6 +4,7 @@ from model.world_objects.displayable import Displayable
 from model.world_objects.displayables.dot import Dot
 from model.world_objects.displayables.wireframe import Wireframe
 from model.world_objects.displayables.line import Line
+from model.world_objects.displayables.bezier_curve import BezierCurve
 from typing import List, Literal
 from model.coordinate import Coordinate2D
 from view.gui import Gui
@@ -41,7 +42,7 @@ class Controller:
         while True:
             self.__gui.update()
 
-    def create_object(self, name: str, color: str, object_type: Literal['dot', 'line', 'wireframe'], coordinates: List[Coordinate2D]):
+    def create_object(self, name: str, color: str, object_type: Literal['dot', 'line', 'wireframe', 'bezier'], coordinates: List[Coordinate2D]):
         # color is '#rgb' or '#rrggbb'
         if object_type == 'dot':
             self.observable_display_file.append(Dot(name, color, coordinates))
@@ -49,6 +50,8 @@ class Controller:
             self.observable_display_file.append(Line(name, color, coordinates))
         elif object_type == 'wireframe':
             self.observable_display_file.append(Wireframe(name, color, coordinates))
+        elif object_type == 'bezier':
+            self.observable_display_file.append(BezierCurve(name, color, coordinates))
 
     def zoom(self, direction: Literal['in', 'out']):
         if direction == 'in':
