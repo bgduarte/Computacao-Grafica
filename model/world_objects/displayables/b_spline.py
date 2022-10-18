@@ -1,7 +1,6 @@
 from model.world_objects.displayables.curve import Curve
 from utils.matrix_helper import MatrixHelper
-from typing import List
-from model.coordinate import Coordinate2D
+from utils.curve_algorithms import CurveAlgorithms
 
 
 class BSpline(Curve):
@@ -20,29 +19,6 @@ class BSpline(Curve):
             [1 / 6, 4 / 6, 1 / 6, 0]
         ]
 
-    def forward_differences(self, number_of_points: int,
-                           Dx: List[List[float]], Dy: List[List[float]]) -> List[List[Coordinate2D]]:
-        x = Dx[0][0]
-        y = Dy[0][0]
-        old_x = x
-        old_y = y
-        lines = []
-        for i in range(0, number_of_points):
-            x += Dx[1][0]
-            Dx[1][0] += Dx[2][0]
-            Dx[2][0] += Dx[3][0]
-
-            y += Dy[1][0]
-            Dy[1][0] += Dy[2][0]
-            Dy[2][0] += Dy[3][0]
-            lines.append([Coordinate2D(old_x, old_y), Coordinate2D(x, y)])
-
-            old_x = x
-            old_y = y
-
-
-        return lines
-
     def _get_drawable_lines(self):
         lines = []
         Mbs = self._get_method_matrix()
@@ -56,25 +32,25 @@ class BSpline(Curve):
             [6 * fi * fi * fi, 0, 0, 0]
         ]
 
-        for i in range(0, len(self._coordinates) -3):
+        for i in range(-1, len(self._coordinates) -2):
             Gx = [
-                [self._coordinates[i].x],
+                [self._coordinates[i if i != -1 else 0].x],
                 [self._coordinates[i+1].x],
                 [self._coordinates[i+2].x],
-                [self._coordinates[i+3].x],
-            ]
+                [self._coordinates[i+3 if i + 3 < len(self._coordinates) else i + 2].x],
+                ]
             Cx = MatrixHelper.mul(Mbs, Gx)
             Dx = MatrixHelper.mul(Efi, Cx)
 
             Gy = [
-                [self._coordinates[i].y],
+                [self._coordinates[i if i != -1 else 0].y],
                 [self._coordinates[i+1].y],
                 [self._coordinates[i+2].y],
-                [self._coordinates[i+3].y],
+                [self._coordinates[i+3 if i + 3 < len(self._coordinates) else i + 2].y],
             ]
             Cy = MatrixHelper.mul(Mbs, Gy)
             Dy = MatrixHelper.mul(Efi, Cy)
 
-            lines += (self.forward_differences(number_of_points=self._resolution, Dx=Dx, Dy=Dy))
+            lines += (CurveAlgorithms.forward_differences(number_of_points=self._resolution, Dx=Dx, Dy=Dy))
 
         return lines

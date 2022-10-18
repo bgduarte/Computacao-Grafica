@@ -65,7 +65,7 @@ def main():
     curve = helper.create_spline_curve([
         Coordinate2D(100,100),
         Coordinate2D(200, 100),
-        Coordinate2D(300, 100),
+        Coordinate2D(300, 200),
         Coordinate2D(400, 100),
         Coordinate2D(500, 100),
         Coordinate2D(600, 100),
