@@ -1,5 +1,6 @@
 from controller.controller import Controller
 from model.coordinate import Coordinate2D
+from model.world_objects.displayables.b_spline import BSpline
 from model.world_objects.displayables.wireframe import Wireframe
 from model.world_objects.displayables.line import Line
 from model.world_objects.displayables.dot import Dot
@@ -48,6 +49,11 @@ class DebugHelper:
         self.__controller.observable_display_file.append(curve)
         return curve
 
+    def create_spline_curve(self, coords: List[Coordinate2D]):
+        curve = BSpline(coordinates=coords, name="Curve", color='#000')
+        self.__controller.observable_display_file.append(curve)
+        return curve
+
 
 def main():
     controller = Controller()
@@ -56,18 +62,15 @@ def main():
     # you need to trigger by using the interface)
     #square1 = helper.create_square(position=(100, 100), size=30)
     #dot = helper.create_dot(position=(400,400))
-    curve = helper.create_bezier_curve([
-        Coordinate2D(100,0),
-        Coordinate2D(100, 100),
-        Coordinate2D(0,100),
-        Coordinate2D(0, 0),
-        Coordinate2D(0, 0),
-        Coordinate2D(0, -100),
-        Coordinate2D(-100, -70),
-        Coordinate2D(-30, 0),
-
+    curve = helper.create_spline_curve([
+        Coordinate2D(100,100),
+        Coordinate2D(200, 100),
+        Coordinate2D(300, 100),
+        Coordinate2D(400, 100),
+        Coordinate2D(500, 100),
+        Coordinate2D(600, 100),
     ])
-    line = helper.create_line((100, 100), (100, 200))
+    #line = helper.create_line((100, 100), (100, 200))
     #square1.scale_around_self(Coordinate2D(2, 2))
     #square1.translate(Coordinate2D(15, 0))
     #square1.rotate_around_self(15)
