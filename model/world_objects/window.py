@@ -2,16 +2,24 @@ import math
 from typing import List, Literal, Tuple, Union
 
 from model.world_object import WorldObject
-from model.coordinate import Coordinate2D
+from model.coordinate import Coordinate2D,Coordinate3D
 from model.world_objects.displayable import Displayable
+from utils.matrix_helper import MatrixHelper
 from utils.clipper import Clipper
 
 
 class Window(WorldObject):
     __clipping_method: Literal['liang_barsky', 'cohen_sutherland']
 
-    def __init__(self, top_left: Coordinate2D, top_right: Coordinate2D, bottom_left: Coordinate2D):
+    def __init__(self, top_left: Coordinate3D, top_right: Coordinate3D, bottom_left: Coordinate3D, center_back: Coordinate3D= None):
         super().__init__(coordinates=[top_left, top_right, bottom_left])
+        if center_back is None:
+            up = bottom_left - top_left
+            left = top_left - top_right
+            back = up * left
+            back = back.normalize()
+            center_back = self.get_window_center() + back.normalize()
+            self._coordinates.append(center_back)
 
     def clip_line(self, line: List[Coordinate2D]) -> Union[Tuple[Coordinate2D, Coordinate2D], None]:
         if self.__clipping_method == 'liang_barsky':
@@ -38,16 +46,20 @@ class Window(WorldObject):
         return Displayable.Drawable(lines, points, drawable.color)
 
     @property
-    def top_left(self) -> Coordinate2D:
+    def top_left(self) -> Coordinate3D:
         return self._coordinates[0]
 
     @property
-    def top_right(self) -> Coordinate2D:
+    def top_right(self) -> Coordinate3D:
         return self._coordinates[1]
 
     @property
-    def bottom_left(self) -> Coordinate2D:
+    def bottom_left(self) -> Coordinate3D:
         return self._coordinates[2]
+
+    @property
+    def center_back(self) -> Coordinate3D:
+        return self._coordinates[3]
 
     @property
     def height(self) -> float:
@@ -80,15 +92,16 @@ class Window(WorldObject):
         # TODO: change this approach
         return math.degrees(math.atan2(w_up.y*y_axis.x - w_up.x*y_axis.y, w_up.x*y_axis.x + w_up.y*y_axis.y))
 
-    def _transform_coord(self, coord: Coordinate2D):
-        new_point = Coordinate2D(coord.copy())
+    def _transform_coord(self, coord: Coordinate3D):
+        # TODO: Add projection calculation
+        new_point = Coordinate3D(coord.copy())
         new_point.translate(-self.get_window_center())
         new_point.rotate(self._get_angle())
         new_point.x = new_point.x / (self.width * 0.5)
         new_point.y = new_point.y / (self.height * 0.5)
-        return new_point
+        return Coordinate2D(new_point)
 
-    def get_window_center(self) -> Coordinate2D:
+    def get_window_center(self) -> Coordinate3D:
         center = self.bottom_left + ((self.top_left-self.bottom_left)*0.5)
         return center + ((self.top_right - self.top_left)*0.5)
 

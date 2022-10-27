@@ -1,12 +1,12 @@
 from typing import List
-from model.coordinate import Coordinate2D
+from model.coordinate import Coordinate3D
 
 
 class CurveAlgorithms:
 
     @staticmethod
     def forward_differences(number_of_points: int,
-                            Dx: List[List[float]], Dy: List[List[float]]) -> List[List[Coordinate2D]]:
+                            Dx: List[List[float]], Dy: List[List[float]]) -> List[List[Coordinate3D]]:
         x = Dx[0][0]
         y = Dy[0][0]
         old_x = x
@@ -20,7 +20,7 @@ class CurveAlgorithms:
             y += Dy[1][0]
             Dy[1][0] += Dy[2][0]
             Dy[2][0] += Dy[3][0]
-            lines.append([Coordinate2D(old_x, old_y), Coordinate2D(x, y)])
+            lines.append([Coordinate3D(old_x, old_y), Coordinate3D(x, y)])
 
             old_x = x
             old_y = y

@@ -1,6 +1,6 @@
 from model.world_objects.displayables.curve import Curve
 from utils.matrix_helper import MatrixHelper
-from model.coordinate import Coordinate2D
+from model.coordinate import Coordinate3D
 
 
 class BezierCurve(Curve):
@@ -52,6 +52,6 @@ class BezierCurve(Curve):
                 x = MatrixHelper.mul(MatrixHelper.mul(T, Mb), Gx)[0][0]
                 y = MatrixHelper.mul(MatrixHelper.mul(T, Mb), Gy)[0][0]
 
-                points.append(Coordinate2D(x, y))
+                points.append(Coordinate3D(x, y))
 
         return [[points[i], points[i+1]] for i in range(len(points)-1)]

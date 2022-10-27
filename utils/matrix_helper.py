@@ -6,7 +6,7 @@ from itertools import starmap
 from operator import mul
 
 if TYPE_CHECKING:
-    from model.coordinate import Coordinate2D
+    from model.coordinate import Coordinate3D
 
 
 class MatrixHelper: # TODO: Generalize to 3D+ support
@@ -17,6 +17,23 @@ class MatrixHelper: # TODO: Generalize to 3D+ support
     @staticmethod
     def dot(vector: List[float], matrix: List[List[float]]) -> List[List[float]]:
         return [sum(starmap(mul, zip(vector, col))) for col in zip(*matrix)]
+
+    @staticmethod
+    def cross(vector:List[float], vector2:List[float]) -> List[float]:
+        dimension = len(vector)
+        result = []
+        for i in range(dimension):
+            result.append(0)
+            for j in range(dimension):
+                if j != i:
+                    for k in range(dimension):
+                        if k != i:
+                            if k > j:
+                                result[i] += vector[j] * vector2[k]
+                            elif k < j:
+                                result[i] -= vector[j] * vector2[k]
+        return result
+
 
     @staticmethod
     def mul(a: List[List[float]], b: List[List[float]]) -> List[List[float]]:
@@ -33,27 +50,50 @@ class MatrixHelper: # TODO: Generalize to 3D+ support
 
     @staticmethod
     # Receives a vector that represents the translation, returns a matrix to apply that operation
-    def translation_matrix(v: Coordinate2D) -> List[List[float]]:
+    def translation_matrix(v: Coordinate3D) -> List[List[float]]:
         return [
-            [1,   0,   0],
-            [0,   1,   0],
-            [v.x, v.y, 1]
+            [1,   0,   0,  0],
+            [0,   1,   0,  0],
+            [0,   0,   1,  0],
+            [v.x, v.y, v.z, 1]
         ]
 
     @staticmethod
-    def scale_matrix(s: Coordinate2D) -> List[List[float]]:
+    def scale_matrix(s: Coordinate3D) -> List[List[float]]:
         return [
-            [s.x, 0,  0],
-            [0,  s.y, 0],
-            [0,  0,   1]
+            [s.x, 0,  0, 0],
+            [0,  s.y, 0, 0],
+            [0,  0, s.z, 0],
+            [0,  0, 0,  1]
         ]
 
     # Receives the angle in degrees and creates the rotation matrix
     @staticmethod
-    def rotation_matrix(angle: float) -> List[List[float]]:
+    def rotation_matrix_x(angle: float) -> List[List[float]]:
         a = MatrixHelper.degrees_to_radians(angle)
         return [
-            [cos(a), -sin(a), 0],
-            [sin(a),  cos(a), 0],
-            [  0,       0,    1]
+            [1, 0, 0, 0],
+            [0, cos(a), sin(a), 0],
+            [0, -sin(a), cos(a), 0],
+            [0, 0, 0, 1],
+        ]
+
+    @staticmethod
+    def rotation_matrix_y(angle: float) -> List[List[float]]:
+        a = MatrixHelper.degrees_to_radians(angle)
+        return [
+            [cos(a), 0, -(sin(a)), 0],
+            [0, 1, 0, 0],
+            [sin(a), 0, cos(a), 0],
+            [0, 0, 0, 1],
+        ]
+
+    @staticmethod
+    def rotation_matrix_z(angle: float) -> List[List[float]]:
+        a = MatrixHelper.degrees_to_radians(angle)
+        return [
+            [cos(a), sin(a), 0, 0],
+            [-sin(a), cos(a), 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1],
         ]

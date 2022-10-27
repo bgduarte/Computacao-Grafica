@@ -1,5 +1,5 @@
 from typing import List
-from model.coordinate import Coordinate2D
+from model.coordinate import Coordinate
 from dataclasses import dataclass
 from model.world_object import WorldObject
 from abc import abstractmethod
@@ -13,11 +13,11 @@ class Displayable(WorldObject):
 
     @dataclass
     class Drawable:
-        lines: List[List[Coordinate2D]]
-        points: List[Coordinate2D]
+        lines: List[List[Coordinate]]
+        points: List[Coordinate]
         color: str
 
-    def __init__(self, name: str, color: str, coordinates: List[Coordinate2D]) -> None:
+    def __init__(self, name: str, color: str, coordinates: List[Coordinate]) -> None:
         # color is '#rgb' or '#rrggbb'
         super().__init__(coordinates=coordinates)
         self._name = name

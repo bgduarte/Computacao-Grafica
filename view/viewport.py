@@ -1,7 +1,7 @@
 from tkinter import *
 from typing import List, Literal
 from model.world_objects.displayable import Displayable
-from model.coordinate import Coordinate2D
+from model.coordinate import Coordinate2D, Coordinate3D
 from model.world_objects.window import Window
 
 
@@ -22,9 +22,9 @@ class Viewport:
         self.__canvas = canvas
         self.__canvas.update()
         self.__window = Window(
-            top_left=Coordinate2D(0, self.get_height()),
-            top_right=Coordinate2D(self.get_width(), self.get_height()),
-            bottom_left=Coordinate2D(0, 0)
+            top_left=Coordinate3D(0, self.get_height(), 0),
+            top_right=Coordinate3D(self.get_width(), self.get_height(), 0),
+            bottom_left=Coordinate3D(0, 0, 0)
         )
         self.__world_origin = Coordinate2D(0, 0)
         self.__draw_viewport()
@@ -53,7 +53,7 @@ class Viewport:
 
     def __zoom(self, amount: float):
         # Add option to zoom irregularly in interface (different x t ammount)
-        self.__window.scale_around_self(Coordinate2D(amount, amount))
+        self.__window.scale_around_self(Coordinate3D(amount, amount, amount))
 
     def __tranform_coord(self, coord: Coordinate2D) -> Coordinate2D:
         x = (coord[0] + 1)*0.5*self.get_width()
@@ -75,7 +75,9 @@ class Viewport:
         # TODO: not redraw all every time
         self.__canvas.delete('all')
         self.__draw_viewport()
+
         for displayable in display_file:
+            print(displayable.get_coordinates())
             drawable = self.__window.coord_to_window_system(displayable.get_drawable())
             drawable = self.__window.clip(drawable)
             for point in drawable.points:
@@ -86,10 +88,10 @@ class Viewport:
         self.__canvas.update()
 
     def get_width(self) -> int:
-        return self.__canvas.winfo_width() - 2*self.__border_width ## TODO: remove the division after testing the clipping
+        return self.__canvas.winfo_width() - 2*self.__border_width
 
     def get_height(self) -> int:
-        return self.__canvas.winfo_height() - 2*self.__border_width ## TODO: remove the division after testing the clipping
+        return self.__canvas.winfo_height() - 2*self.__border_width
 
     def zoom_in(self) -> None:
         self.__zoom(1/Viewport.ZOOM_AMOUNT)

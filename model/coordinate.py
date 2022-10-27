@@ -32,9 +32,12 @@ class Coordinate(List):
         return math.sqrt(result)
 
     def __mul__(self, other):
-        if not isinstance(other, numbers.Number):
+        if isinstance(other, numbers.Number):
+            return type(self)([e * other for e in self])
+        elif isinstance(other, Coordinate) and len(self) == len(other):
+            return type(self)(MatrixHelper.cross(self, other))
+        else:
             raise Exception(f'Coordinate can only be multiplied by numbers, not by {type(other)}')
-        return type(self)([e*other for e in self])
 
     def normalize(self):
         return type(self)([e/self.length for e in self])
@@ -45,7 +48,7 @@ class Coordinate(List):
 
     @classmethod
     def up(cls):
-        up =  []
+        up = []
         for i in range(cls.limit_size):
             up.append(0 if i != 1 else 1)
 
@@ -63,7 +66,7 @@ class Coordinate(List):
             self[i] = vector[i]
 
     def rotate(self, angle):
-        self.transform([MatrixHelper.rotation_matrix(angle)])
+        self.transform([MatrixHelper.rotation_matrix_z(angle)])
 
     def translate(self, movement_vector):
         self.transform([MatrixHelper.translation_matrix(movement_vector)])
@@ -104,6 +107,8 @@ class Coordinate3D(Coordinate2D):
         if isinstance(x, list):
             super(Coordinate3D, self).__init__(x)
         else:
+            if z is None:
+                z = 0
             super(Coordinate3D, self).__init__([x, y, z])
 
     @property

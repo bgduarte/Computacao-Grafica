@@ -7,6 +7,7 @@ from model.world_objects.displayables.line import Line
 from model.world_objects.displayables.bezier_curve import BezierCurve
 from model.world_objects.displayables.b_spline import BSpline
 from typing import List, Literal
+from model.coordinate import Coordinate3D
 from model.coordinate import Coordinate2D
 from view.gui import Gui
 from utils.wavefront_file_parser import WavefrontFileParser
@@ -45,6 +46,9 @@ class Controller:
 
     def create_object(self, name: str, color: str, object_type: Literal['dot', 'line', 'wireframe', 'bezier', 'spline'], coordinates: List[Coordinate2D]):
         # color is '#rgb' or '#rrggbb'
+
+        # TODO: rethink this
+        coordinates = [Coordinate3D(list(coord) + [0]) for coord in coordinates]
         if object_type == 'dot':
             self.observable_display_file.append(Dot(name, color, coordinates))
         elif object_type == 'line':
@@ -68,15 +72,21 @@ class Controller:
         self.__viewport.draw(self.observable_display_file.displayables())
 
     def translate_object(self, displayable: Displayable, movement_vector: Coordinate2D) -> None:
+        # TODO: fix this
+        movement_vector = Coordinate3D(list(movement_vector) +[0])
         displayable.translate(movement_vector)
         self.__viewport.draw(self.observable_display_file.displayables())
 
     def scale_object(self, displayable: Displayable, scale_vector: Coordinate2D) -> None:
+        # TODO: fix this
+        scale_vector = Coordinate3D(list(scale_vector) +[0])
         displayable.scale_around_self(scale_vector)
         self.__viewport.draw(self.observable_display_file.displayables())
         
     def rotate_object(self, displayable: Displayable, angle: float,
                       relative_to: Literal['world', 'itself', 'coordinate'], center: Coordinate2D = None) -> None:
+        # TODO: fix this
+        center = Coordinate3D(list(center) +[0])
         if relative_to == 'world':
             displayable.rotate(angle)
         elif relative_to == 'itself':
