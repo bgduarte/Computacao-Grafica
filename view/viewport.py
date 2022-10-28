@@ -108,6 +108,17 @@ class Viewport:
             self.__window.move_left(amount)
         elif direction == 'right':
             self.__window.move_right(amount)
+        
+    def tilt(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
+        amount = Viewport.WINDOW_ROTATION_AMOUNT
+        if direction == 'up':
+            self.__window.rotate_x(amount)
+        elif direction == 'down':
+            self.__window.rotate_x(-amount)
+        elif direction == 'left':
+            self.__window.rotate_y(-amount)
+        elif direction == 'right':
+            self.__window.rotate_y(amount)
 
     def rotate_window(self, direction: Literal['left', 'right']):
         amount = -Viewport.WINDOW_ROTATION_AMOUNT if direction == 'left' else Viewport.WINDOW_ROTATION_AMOUNT

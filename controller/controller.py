@@ -44,11 +44,8 @@ class Controller:
         while True:
             self.__gui.update()
 
-    def create_object(self, name: str, color: str, object_type: Literal['dot', 'line', 'wireframe', 'bezier', 'spline'], coordinates: List[Coordinate2D]):
+    def create_object(self, name: str, color: str, object_type: Literal['dot', 'line', 'wireframe', 'bezier', 'spline'], coordinates: List[Coordinate3D]):
         # color is '#rgb' or '#rrggbb'
-
-        # TODO: rethink this
-        coordinates = [Coordinate3D(list(coord) + [0]) for coord in coordinates]
         if object_type == 'dot':
             self.observable_display_file.append(Dot(name, color, coordinates))
         elif object_type == 'line':
@@ -70,16 +67,20 @@ class Controller:
     def navigate(self, direction: Literal['up', 'down', 'left', 'right']):
         self.__viewport.navigate(direction)
         self.__viewport.draw(self.observable_display_file.displayables())
+    
+    def tilt(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
+        self.__viewport.tilt(direction)
+        self.__viewport.draw(self.observable_display_file.displayables())
+    
+    def move(self, direction: Literal['forward', 'backward']) -> None:
+        self.__viewport.navigate(direction)
+        self.__viewport.draw(self.observable_display_file.displayables())
 
-    def translate_object(self, displayable: Displayable, movement_vector: Coordinate2D) -> None:
-        # TODO: fix this
-        movement_vector = Coordinate3D(list(movement_vector) +[0])
+    def translate_object(self, displayable: Displayable, movement_vector: Coordinate3D) -> None:
         displayable.translate(movement_vector)
         self.__viewport.draw(self.observable_display_file.displayables())
 
-    def scale_object(self, displayable: Displayable, scale_vector: Coordinate2D) -> None:
-        # TODO: fix this
-        scale_vector = Coordinate3D(list(scale_vector) +[0])
+    def scale_object(self, displayable: Displayable, scale_vector: Coordinate3D) -> None:
         displayable.scale_around_self(scale_vector)
         self.__viewport.draw(self.observable_display_file.displayables())
         
@@ -98,7 +99,6 @@ class Controller:
     def rotate_window(self, direction: Literal['left', 'right']) -> None:
         self.__viewport.rotate_window(direction)
         self.__viewport.draw(self.observable_display_file.displayables())
-
 
     def import_wavefront_file(self, filepath: str) -> None:
         new_displayables, new_window = WavefrontFileParser.import_file(filepath)

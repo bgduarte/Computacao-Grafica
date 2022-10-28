@@ -4,7 +4,7 @@ from tkinter import filedialog
 from tkinter.messagebox import askyesno, showinfo
 from tkinter.ttk import Notebook
 from typing import Callable, Final, List, Literal, Tuple, TYPE_CHECKING
-from model.coordinate import Coordinate2D, Coordinate3D
+from model.coordinate import Coordinate3D
 from model.world_objects.displayable import Displayable
 import re
 
@@ -32,7 +32,7 @@ class Gui:
     def __init__(self, controller: Controller) -> None:
         self.__controller = controller
         self.__root = Tk()
-        self.__root.title("Sistema Básico de CG 2D")
+        self.__root.title("Sistema Básico de CG 3D")
         self.__root.resizable(width=False, height=False)
         self.__obj_varlist = Variable(value=[])
         controller.observable_display_file.subscribe(self.update_obj_varlist)
@@ -105,25 +105,32 @@ class Gui:
 
     def __create_navigation_frame(self, main_frame: Frame) -> Frame:
         navigation_frame = LabelFrame(main_frame, text="Navegação", font=('Helvetica', self.FONT_SIZE_DEFAULT),
-                                      width=self.WIDTH / 4, height=self.HEIGHT * 1 / 6, borderwidth=2, relief=GROOVE)
+                                      width=self.WIDTH / 4, height=self.HEIGHT * 1 / 5, borderwidth=2, relief=GROOVE)
         navigation_frame.pack(padx=10, pady=10, side=TOP, anchor=W, fill=X, expand=True)
         navigation_frame.grid_propagate(0)
 
-        for i in range(3):
+        for i in range(5):
             navigation_frame.rowconfigure(i, weight=1, uniform='r')
             navigation_frame.columnconfigure(i, weight=1, uniform='c')
 
         Button(navigation_frame, text="↶", command=lambda: self.__handle_rotate('left')).grid(row=0, column=0)
-        Button(navigation_frame, text="↷", command=lambda: self.__handle_rotate('right')).grid(row=0, column=2)
+        Button(navigation_frame, text="↷", command=lambda: self.__handle_rotate('right')).grid(row=0, column=4)
 
-        Button(navigation_frame, text="↑", command=lambda: self.__handle_nav('up')).grid(row=0, column=1)
-        Button(navigation_frame, text="←", command=lambda: self.__handle_nav('left')).grid(row=1, column=0)
-        Button(navigation_frame, text="→", command=lambda: self.__handle_nav('right')).grid(row=1, column=2)
-        Button(navigation_frame, text="↓", command=lambda: self.__handle_nav('down')).grid(row=2, column=1)
+        Button(navigation_frame, text="↑", command=lambda: self.__handle_nav('up')).grid(row=0, column=2)
+        Button(navigation_frame, text="←", command=lambda: self.__handle_nav('left')).grid(row=2, column=0)
+        Button(navigation_frame, text="→", command=lambda: self.__handle_nav('right')).grid(row=2, column=4)
+        Button(navigation_frame, text="↓", command=lambda: self.__handle_nav('down')).grid(row=4, column=2)
 
-        Button(navigation_frame, text="Zoom Out", command=lambda: self.__handle_zoom('out')).grid(row=2, column=0)
-        Button(navigation_frame, text="Zoom In", command=lambda: self.__handle_zoom('in')).grid(row=2, column=2)
+        Button(navigation_frame, text="⮝", command=lambda: self.__handle_tilt('up')).grid(row=1, column=2)
+        Button(navigation_frame, text="⮜", command=lambda: self.__handle_tilt('left')).grid(row=2, column=1)
+        Button(navigation_frame, text="⮞", command=lambda: self.__handle_tilt('right')).grid(row=2, column=3)
+        Button(navigation_frame, text="⮟", command=lambda: self.__handle_tilt('down')).grid(row=3, column=2)
 
+        Button(navigation_frame, text="↥", command=lambda: self.__handle_move('forward')).grid(row=4, column=4)
+        Button(navigation_frame, text="↧", command=lambda: self.__handle_move('backward')).grid(row=4, column=3)
+
+        Button(navigation_frame, text="+", command=lambda: self.__handle_zoom('out')).grid(row=4, column=1)
+        Button(navigation_frame, text="–", command=lambda: self.__handle_zoom('in')).grid(row=4, column=0)
 
         return navigation_frame
     
@@ -154,7 +161,7 @@ class Gui:
         tabs = Notebook(form_frame)
         tabs.pack(pady=10, fill=BOTH, expand=True)
         tabs_coords_inputs = []
-        for i, tab_name in enumerate(['Ponto', 'Linha', 'Polígono', 'Bezier', 'B Spline']):
+        for i, tab_name in enumerate(['Ponto', 'Linha', 'Wireframe']): #, 'Bezier', 'B Spline']):
             tab_frame = Frame(tabs)
             tab_frame.pack(fill=BOTH, expand=True)
             self.__create_label(tab_frame, "Coordenadas:", pady=4, padx=10, anchor=NW)
@@ -165,7 +172,7 @@ class Gui:
             if tab_name == 'Bezier' or tab_name == 'B Spline':
                 coords_inputs = self.__add_coord_inputs(tab_frame, coords_inputs, 4)
             tabs_coords_inputs.append(coords_inputs)
-            if tab_name == 'Polígono' or tab_name == 'Bezier' or tab_name == 'B Spline':
+            if tab_name == 'Wireframe' or tab_name == 'Bezier' or tab_name == 'B Spline':
                 self.__create_button(tab_frame, "+", self.__add_coord_inputs, tab_frame, tabs_coords_inputs[i],
                                      4 if tab_name == 'Bezier' else 1, align=RIGHT)
                 self.__create_button(tab_frame, "–", self.__remove_last_coords_input, tabs_coords_inputs[i],
@@ -193,14 +200,15 @@ class Gui:
         frame.pack(fill=BOTH, expand=True)
         self.__create_label(frame, "Vetor de Movimento")
         coords_frame = Frame(frame)
-        x_input = self.__create_input(coords_frame, "x", padx=40, align=LEFT)
-        y_input = self.__create_input(coords_frame, "y", padx=40, align=RIGHT)
+        x_input = self.__create_input(coords_frame, "x", padx=40, width=8)
+        y_input = self.__create_input(coords_frame, "y", padx=40, width=8)
+        z_input = self.__create_input(coords_frame, "z", padx=40, width=8)
         coords_frame.pack(pady=10, fill=X)
-        def handle_apply_btn(displayable: Displayable, x_inp: Entry, y_inp: Entry) -> None:
-            movement_vector = Coordinate2D(float(x_inp.get()), float(y_inp.get()))
+        def handle_apply_btn(displayable: Displayable, x_inp: Entry, y_inp: Entry, z_inp: Entry) -> None:
+            movement_vector = Coordinate3D(float(x_inp.get()), float(y_inp.get()), float(z_inp.get()))
             self.__controller.translate_object(displayable, movement_vector)
 
-        self.__create_button(frame, 'Aplicar', handle_apply_btn, obj, x_input, y_input, align=BOTTOM)
+        self.__create_button(frame, 'Aplicar', handle_apply_btn, obj, x_input, y_input, z_input, align=BOTTOM)
         return frame
 
     def __create_scale_frame(self, tabs: Notebook, obj: Displayable) -> Frame:
@@ -208,14 +216,15 @@ class Gui:
         frame.pack(fill=BOTH, expand=True)
         self.__create_label(frame, "Vetor de Escala")
         coords_frame = Frame(frame)
-        x_input = self.__create_input(coords_frame, "x", padx=40, align=LEFT)
-        y_input = self.__create_input(coords_frame, "y", padx=40, align=RIGHT)
+        x_input = self.__create_input(coords_frame, "x", padx=40, width=8)
+        y_input = self.__create_input(coords_frame, "y", padx=40, width=8)
+        z_input = self.__create_input(coords_frame, "z", padx=40, width=8)
         coords_frame.pack(pady=10, fill=X)
-        def handle_apply_btn(displayable: Displayable, x_inp: Entry, y_inp: Entry) -> None:
-            scale_vector = Coordinate2D(float(x_inp.get()), float(y_inp.get()))
+        def handle_apply_btn(displayable: Displayable, x_inp: Entry, y_inp: Entry, z_inp: Entry) -> None:
+            scale_vector = Coordinate3D(float(x_inp.get()), float(y_inp.get()), float(z_inp.get()))
             self.__controller.scale_object(displayable, scale_vector)
 
-        self.__create_button(frame, 'Aplicar', handle_apply_btn, obj, x_input, y_input, align=BOTTOM)
+        self.__create_button(frame, 'Aplicar', handle_apply_btn, obj, x_input, y_input, z_input, align=BOTTOM)
         return frame
 
     def __create_rotate_frame(self, tabs: Notebook, obj: Displayable) -> Frame:
@@ -291,8 +300,9 @@ class Gui:
         if not obj_name_input.get(): return
         if not self.__is_valid_color(obj_color_input.get()): return
         selected_tab = tabs.index(tabs.select())
-        obj_coords = [Coordinate2D(float(x.get()), float(y.get()))
-                      for (x, y) in tabs_coords_inputs[selected_tab]]
+        obj_coords = [Coordinate3D(float(x.get()), float(y.get()), float(z.get()))
+                      for (x, y, z) in tabs_coords_inputs[selected_tab]]
+        print(obj_coords)
         obj_type = ['dot', 'line', 'wireframe', 'bezier', 'spline']
         obj_type = obj_type[selected_tab]
         self.__controller.create_object(obj_name_input.get(), obj_color_input.get(), obj_type, obj_coords)
@@ -310,6 +320,12 @@ class Gui:
 
     def __handle_nav(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
         self.__controller.navigate(direction)
+    
+    def __handle_tilt(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
+        self.__controller.tilt(direction)
+    
+    def __handle_move(self, direction: Literal['forward', 'backward']) -> None:
+        self.__controller.move(direction)
 
     def __handle_zoom(self, direction: Literal['in', 'out']) -> None:
         self.__controller.zoom(direction)
@@ -320,7 +336,8 @@ class Gui:
         for _ in range(n_coords):
             x_input = self.__create_input(inputs_frame, "x", padx=5, align=LEFT, width=5)
             y_input = self.__create_input(inputs_frame, "y", padx=5, align=LEFT, width=5)
-            coords_inputs.append((x_input, y_input))
+            z_input = self.__create_input(inputs_frame, "z", padx=5, align=LEFT, width=5)
+            coords_inputs.append((x_input, y_input, z_input))
         return coords_inputs
 
     def __remove_last_coords_input(self, coords_inputs: List[Tuple[Entry, Entry]]) -> List[Tuple[Entry, Entry]]:
