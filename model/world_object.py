@@ -18,8 +18,14 @@ class WorldObject(ABC):
     def _constraint_check(self):
         pass
 
-    def rotate(self, angle):
+    def rotate_z(self, angle):
         self.transform([MatrixHelper.rotation_matrix_z(angle)])
+
+    def rotate_x(self, angle):
+        self.transform([MatrixHelper.rotation_matrix_x(angle)])
+
+    def rotate_y(self, angle):
+        self.transform([MatrixHelper.rotation_matrix_y(angle)])
 
     def translate(self, movement_vector: Coordinate):
         self.transform([MatrixHelper.translation_matrix(Coordinate3D(movement_vector))])
@@ -62,7 +68,7 @@ class WorldObject(ABC):
             # Translate to origin
             MatrixHelper.translation_matrix(-translation_vector),
             # Rotates
-            MatrixHelper.rotation_matrix_z(angle),
+            MatrixHelper.rotation_matrix_y(angle),
             # Translate back to the same position
             MatrixHelper.translation_matrix(translation_vector)
         ])

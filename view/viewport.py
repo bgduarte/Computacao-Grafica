@@ -111,5 +111,6 @@ class Viewport:
             self.__window.move_right(amount)
 
     def rotate_window(self, direction: Literal['left', 'right']):
-        amount = Viewport.WINDOW_ROTATION_AMOUNT if direction == 'left' else -Viewport.WINDOW_ROTATION_AMOUNT
+        amount = -Viewport.WINDOW_ROTATION_AMOUNT if direction == 'left' else Viewport.WINDOW_ROTATION_AMOUNT
+        # TODO: make the rotation based on where the window is facing
         self.__window.rotate_around_point(amount, self.__window.get_window_center())

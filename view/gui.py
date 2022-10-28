@@ -4,7 +4,7 @@ from tkinter import filedialog
 from tkinter.messagebox import askyesno, showinfo
 from tkinter.ttk import Notebook
 from typing import Callable, Final, List, Literal, Tuple, TYPE_CHECKING
-from model.coordinate import Coordinate2D
+from model.coordinate import Coordinate2D, Coordinate3D
 from model.world_objects.displayable import Displayable
 import re
 
@@ -245,13 +245,17 @@ class Gui:
         angle_input = self.__create_input(frame)
 
         def handle_apply_btn(displayable: Displayable, var_rel_to: StringVar, angle_inp: Entry,
-                             x_inp: Entry, y_inp: Entry) -> None:
+                             x_inp: Entry, y_inp: Entry, z_inp: Entry =  None) -> None:
             local_relative_to = var_rel_to.get()
             angle = float(angle_inp.get())
             center = None
+
             if local_relative_to == 'coordinate':
-                center = Coordinate2D(float(x_inp.get()), float(y_inp.get()))
-            self.__controller.rotate_object(displayable, angle, local_relative_to, center)
+                x = float(x_inp.get())
+                y = float(y_inp.get())
+                z = float(z_inp.get()) if z_inp is not None else 0
+                center = Coordinate3D(x, y, z)
+            self.__controller.rotate_object(displayable=displayable, angle=angle, relative_to=local_relative_to, center=center)
 
         self.__create_button(frame, 'Aplicar', handle_apply_btn, obj, relative_to, angle_input,
                              x_input, y_input, align=BOTTOM)

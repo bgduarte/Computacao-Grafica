@@ -84,9 +84,8 @@ class Controller:
         self.__viewport.draw(self.observable_display_file.displayables())
         
     def rotate_object(self, displayable: Displayable, angle: float,
-                      relative_to: Literal['world', 'itself', 'coordinate'], center: Coordinate2D = None) -> None:
+                      relative_to: Literal['world', 'itself', 'coordinate'], center: Coordinate3D = None) -> None:
         # TODO: fix this
-        center = Coordinate3D(list(center) +[0])
         if relative_to == 'world':
             displayable.rotate(angle)
         elif relative_to == 'itself':

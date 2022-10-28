@@ -2,7 +2,6 @@ import math
 from typing import List
 from utils.matrix_helper import MatrixHelper
 import numbers
-from abc import abstractmethod
 
 
 class Coordinate(List):
@@ -65,8 +64,14 @@ class Coordinate(List):
         for i in range(len(self)):
             self[i] = vector[i]
 
-    def rotate(self, angle):
+    def rotate_z(self, angle):
         self.transform([MatrixHelper.rotation_matrix_z(angle)])
+
+    def rotate_y(self, angle):
+        self.transform([MatrixHelper.rotation_matrix_y(angle)])
+
+    def rotate_x(self, angle):
+        self.transform([MatrixHelper.rotation_matrix_x(angle)])
 
     def translate(self, movement_vector):
         self.transform([MatrixHelper.translation_matrix(movement_vector)])
