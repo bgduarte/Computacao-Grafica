@@ -293,7 +293,6 @@ class Gui:
         selected_tab = tabs.index(tabs.select())
         obj_coords = [Coordinate2D(float(x.get()), float(y.get()))
                       for (x, y) in tabs_coords_inputs[selected_tab]]
-        print(obj_coords)
         obj_type = ['dot', 'line', 'wireframe', 'bezier', 'spline']
         obj_type = obj_type[selected_tab]
         self.__controller.create_object(obj_name_input.get(), obj_color_input.get(), obj_type, obj_coords)

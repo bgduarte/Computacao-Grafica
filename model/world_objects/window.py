@@ -16,7 +16,7 @@ class Window(WorldObject):
             center_back = self.get_window_center() - self.view_vector
             self._coordinates.append(center_back)
 
-        self.rotate_around_self(90)
+        self.rotate_around_self(angle=45, axis='y')
 
 
     def clip_line(self, line: List[Coordinate2D]) -> Union[Tuple[Coordinate2D, Coordinate2D], None]:
@@ -110,13 +110,12 @@ class Window(WorldObject):
 
     def _transform_coord(self, coord: Coordinate3D):
         # TODO: Add projection calculation
-        print(self._get_angle_with_y())
         new_point = Coordinate3D(coord.copy())
         new_point.translate(-self.get_window_center())
         # Make rotations
 
-        new_point.rotate_y(self._get_angle_with_y())
-        new_point.rotate_x(self._get_angle_with_x())
+        #new_point.rotate(angle=self._get_angle_with_y(), axis='y')
+        #new_point.rotate(angle=self._get_angle_with_x(), axis='x')
         #needs to also tranform window for this to work
         #new_point.rotate_z(-self._get_angle())
 
@@ -126,9 +125,8 @@ class Window(WorldObject):
         return Coordinate2D(new_point)
 
     def get_window_center(self) -> Coordinate3D:
-        # center = self.bottom_left + ((self.top_left-self.bottom_left)*0.5)
-        # return center + ((self.top_right - self.top_left)*0.5)
-        return self.get_center_coord()
+        center = self.bottom_left + ((self.top_left-self.bottom_left)*0.5)
+        return center + ((self.top_right - self.top_left)*0.5)
 
     def _constraint_check(self):
         if len(self._coordinates) != 3:

@@ -1,5 +1,5 @@
 import math
-from typing import List
+from typing import List, Literal
 from utils.matrix_helper import MatrixHelper
 import numbers
 
@@ -64,14 +64,8 @@ class Coordinate(List):
         for i in range(len(self)):
             self[i] = vector[i]
 
-    def rotate_z(self, angle):
-        self.transform([MatrixHelper.rotation_matrix_z(angle)])
-
-    def rotate_y(self, angle):
-        self.transform([MatrixHelper.rotation_matrix_y(angle)])
-
-    def rotate_x(self, angle):
-        self.transform([MatrixHelper.rotation_matrix_x(angle)])
+    def rotate(self, angle, axis: Literal['x', 'y', 'z']):
+        self.transform([MatrixHelper.get_rotation_matrix(angle, axis)])
 
     def translate(self, movement_vector):
         self.transform([MatrixHelper.translation_matrix(movement_vector)])

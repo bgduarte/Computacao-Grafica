@@ -77,7 +77,6 @@ class Viewport:
         self.__draw_viewport()
 
         for displayable in display_file:
-            print(displayable.get_coordinates())
             drawable = self.__window.coord_to_window_system(displayable.get_drawable())
             drawable = self.__window.clip(drawable)
             for point in drawable.points:

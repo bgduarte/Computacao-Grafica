@@ -1,6 +1,6 @@
 from __future__ import annotations
 from math import pi
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Literal
 from math import cos, sin
 from itertools import starmap
 from operator import mul
@@ -97,3 +97,12 @@ class MatrixHelper: # TODO: Generalize to 3D+ support
             [0, 0, 1, 0],
             [0, 0, 0, 1],
         ]
+
+    @staticmethod
+    def get_rotation_matrix(angle, axis: Literal['x', 'y', 'z']):
+        if axis == 'x':
+            return MatrixHelper.rotation_matrix_x(angle)
+        elif axis == 'y':
+            return MatrixHelper.rotation_matrix_y(angle)
+        else:
+            return MatrixHelper.rotation_matrix_z(angle)
