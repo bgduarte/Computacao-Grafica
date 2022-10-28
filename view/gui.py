@@ -129,8 +129,8 @@ class Gui:
         Button(navigation_frame, text="↥", command=lambda: self.__handle_move('forward')).grid(row=4, column=4)
         Button(navigation_frame, text="↧", command=lambda: self.__handle_move('backward')).grid(row=4, column=3)
 
-        Button(navigation_frame, text="+", command=lambda: self.__handle_zoom('out')).grid(row=4, column=1)
-        Button(navigation_frame, text="–", command=lambda: self.__handle_zoom('in')).grid(row=4, column=0)
+        Button(navigation_frame, text="+", command=lambda: self.__handle_zoom('in')).grid(row=4, column=1)
+        Button(navigation_frame, text="–", command=lambda: self.__handle_zoom('out')).grid(row=4, column=0)
 
         return navigation_frame
     
@@ -161,22 +161,22 @@ class Gui:
         tabs = Notebook(form_frame)
         tabs.pack(pady=10, fill=BOTH, expand=True)
         tabs_coords_inputs = []
-        for i, tab_name in enumerate(['Ponto', 'Linha', 'Wireframe']): #, 'Bezier', 'B Spline']):
+        for i, tab_name in enumerate(['Ponto', 'Linha', 'Wireframe', 'Bezier', 'B Spline']):
             tab_frame = Frame(tabs)
             tab_frame.pack(fill=BOTH, expand=True)
             self.__create_label(tab_frame, "Coordenadas:", pady=4, padx=10, anchor=NW)
             coords_inputs = []
-            for _ in range(i + 1):
-                if tab_name != 'Bezier' and tab_name != 'B Spline':
-                    coords_inputs = self.__add_coord_inputs(tab_frame, coords_inputs)
             if tab_name == 'Bezier' or tab_name == 'B Spline':
                 coords_inputs = self.__add_coord_inputs(tab_frame, coords_inputs, 4)
+            else:
+                for _ in range(i + 1):
+                    coords_inputs = self.__add_coord_inputs(tab_frame, coords_inputs, 2 if tab_name == 'Wireframe' else 1)
             tabs_coords_inputs.append(coords_inputs)
             if tab_name == 'Wireframe' or tab_name == 'Bezier' or tab_name == 'B Spline':
                 self.__create_button(tab_frame, "+", self.__add_coord_inputs, tab_frame, tabs_coords_inputs[i],
-                                     4 if tab_name == 'Bezier' else 1, align=RIGHT)
+                                     4 if tab_name == 'Bezier' else 2 if tab_name == 'Wireframe' else 1, align=RIGHT)
                 self.__create_button(tab_frame, "–", self.__remove_last_coords_input, tabs_coords_inputs[i],
-                                     align=RIGHT)
+                                     4 if tab_name == 'Bezier' else 2 if tab_name == 'Wireframe' else 1, align=RIGHT)
             tabs.add(tab_frame, text=tab_name)
         self.__create_button(form_frame, "Adicionar", self.__handle_add_obj_form, form, tabs, obj_name_input,
                              obj_color_input, tabs_coords_inputs, pady=10, align=BOTTOM)
@@ -296,13 +296,12 @@ class Gui:
         self.__create_add_obj_form()
 
     def __handle_add_obj_form(self, form: Toplevel, tabs: Notebook, obj_name_input: Entry, obj_color_input: Entry,
-                              tabs_coords_inputs: List[List[Tuple[Entry, Entry]]]) -> None:
+                              tabs_coords_inputs: List[List[Tuple[Entry, Entry, Entry]]]) -> None:
         if not obj_name_input.get(): return
         if not self.__is_valid_color(obj_color_input.get()): return
         selected_tab = tabs.index(tabs.select())
         obj_coords = [Coordinate3D(float(x.get()), float(y.get()), float(z.get()))
                       for (x, y, z) in tabs_coords_inputs[selected_tab]]
-        print(obj_coords)
         obj_type = ['dot', 'line', 'wireframe', 'bezier', 'spline']
         obj_type = obj_type[selected_tab]
         self.__controller.create_object(obj_name_input.get(), obj_color_input.get(), obj_type, obj_coords)
@@ -330,7 +329,7 @@ class Gui:
     def __handle_zoom(self, direction: Literal['in', 'out']) -> None:
         self.__controller.zoom(direction)
 
-    def __add_coord_inputs(self, parent_frame: Frame, coords_inputs: List[Tuple[Entry, Entry]], n_coords: int = 1) -> List[Tuple[Entry, Entry]]:
+    def __add_coord_inputs(self, parent_frame: Frame, coords_inputs: List[Tuple[Entry, Entry, Entry]], n_coords: int = 1) -> List[Tuple[Entry, Entry, Entry]]:
         inputs_frame = Frame(parent_frame)
         inputs_frame.pack(pady=10, fill=X)
         for _ in range(n_coords):
@@ -340,10 +339,12 @@ class Gui:
             coords_inputs.append((x_input, y_input, z_input))
         return coords_inputs
 
-    def __remove_last_coords_input(self, coords_inputs: List[Tuple[Entry, Entry]]) -> List[Tuple[Entry, Entry]]:
-        if len(coords_inputs) <= 3: return coords_inputs
-        for input in coords_inputs.pop():
-            input.master.destroy()
+    def __remove_last_coords_input(self, coords_inputs: List[Tuple[Entry, Entry, Entry]], n_coords: int = 1) -> List[Tuple[Entry, Entry]]:
+        if len(coords_inputs) <= n_coords: return coords_inputs
+        for _ in range(n_coords):
+            for input in coords_inputs.pop():
+                input.forget()
+                input.master.destroy()
         return coords_inputs
 
     def __on_obj_list_select(self, event: Event[Listbox], buttons: List[Button]) -> None:

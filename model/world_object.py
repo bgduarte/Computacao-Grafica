@@ -18,7 +18,7 @@ class WorldObject(ABC):
     def _constraint_check(self):
         pass
 
-    def rotate(self, angle, axis: Literal['x', 'y', 'z']='z'):
+    def rotate(self, angle, axis: Literal['x', 'y', 'z'] = 'z'):
         self.transform([MatrixHelper.get_rotation_matrix(angle, axis)])
 
     def translate(self, movement_vector: Coordinate):

@@ -17,6 +17,7 @@ class Viewport:
     ZOOM_AMOUNT = 1.1
     NAVIGATION_SPEED = 0.07
     WINDOW_ROTATION_AMOUNT = 15
+    WINDOW_MOVEMENT_AMOUNT = 10
 
     def __init__(self, canvas: Canvas):
         self.__canvas = canvas
@@ -98,7 +99,7 @@ class Viewport:
     def zoom_out(self) -> None:
         self.__zoom(Viewport.ZOOM_AMOUNT)
 
-    def navigate(self, direction: Literal['up', 'down', 'left', 'right']):
+    def navigate(self, direction: Literal['up', 'down', 'left', 'right', 'forward', 'backward']):
         amount =  Viewport.NAVIGATION_SPEED
         if direction == 'up':
             self.__window.move_up(amount)
@@ -108,18 +109,20 @@ class Viewport:
             self.__window.move_left(amount)
         elif direction == 'right':
             self.__window.move_right(amount)
+        elif direction == 'forward':
+            self.__window.move_forward(Viewport.WINDOW_MOVEMENT_AMOUNT)
+        elif direction == 'backward':
+            self.__window.move_forward(-Viewport.WINDOW_MOVEMENT_AMOUNT)
         
     def tilt(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
+        axis = 'y'
+        if direction == 'up' or direction == 'down':
+            axis = 'x'
         amount = Viewport.WINDOW_ROTATION_AMOUNT
-        if direction == 'up':
-            self.__window.rotate_x(amount)
-        elif direction == 'down':
-            self.__window.rotate_x(-amount)
-        elif direction == 'left':
-            self.__window.rotate_y(-amount)
-        elif direction == 'right':
-            self.__window.rotate_y(amount)
-
+        if direction == 'down' or direction == 'left':
+            amount = -amount
+        self.__window.rotate_around_self(amount, axis)
+        
     def rotate_window(self, direction: Literal['left', 'right']):
         amount = -Viewport.WINDOW_ROTATION_AMOUNT if direction == 'left' else Viewport.WINDOW_ROTATION_AMOUNT
         # TODO: make the rotation based on where the window is facing

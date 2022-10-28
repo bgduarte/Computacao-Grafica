@@ -16,17 +16,14 @@ class Window(WorldObject):
             center_back = self.get_window_center() - self.view_vector
             self._coordinates.append(center_back)
 
-        self.rotate_around_self(angle=45, axis='y')
-
-
-    def clip_line(self, line: List[Coordinate2D]) -> Union[Tuple[Coordinate2D, Coordinate2D], None]:
+    def clip_line(self, line: List[Coordinate3D]) -> Union[Tuple[Coordinate2D, Coordinate2D], None]:
         if self.__clipping_method == 'liang_barsky':
             return Clipper.liang_barsky_clip(line[0], line[1])
         elif self.__clipping_method == 'cohen_sutherland':
             return Clipper.cohen_sutherland_clip(line[0], line[1])
 
-    def clip_point(self, point: Coordinate2D) -> Union[Coordinate2D, None]:
-        return point if point.x >= -1 and point.x <= 1 and point.y >= -1 and point.y <= 1 else None
+    def clip_point(self, point: Coordinate3D) -> Union[Coordinate3D, None]:
+        return point if point.x >= -1 and point.x <= 1 and point.y >= -1 else None
 
     def set_clipping_method(self, method: Literal['liang_barsky', 'cohen_sutherland']):
         self.__clipping_method = method
@@ -38,6 +35,8 @@ class Window(WorldObject):
 
     def clip(self, drawable: Displayable.Drawable) -> Displayable.Drawable:
         # applies clipping and appends if clipped is not null
+        for p in drawable.points:
+            if p.z <= 0: return Displayable.Drawable([[]], [], drawable.color)
         points = [clipped_p for p in drawable.points if (clipped_p := self.clip_point(p)) is not None]
         lines = [clipped_l for line in drawable.lines if (clipped_l := self.clip_line(line)) is not None]
         # add missing line
@@ -90,6 +89,10 @@ class Window(WorldObject):
         movement_vector = (self.bottom_left - self.top_left).normalize() * amount * self.height
         self.translate(movement_vector)
 
+    def move_forward(self, amount):
+        movement_vector = -self.view_vector * amount
+        self.translate(movement_vector)
+
     # Returns the angle between the window up and the y-axis
     def _get_angle(self):
         y_axis: Coordinate2D = Coordinate2D.up()
@@ -107,22 +110,21 @@ class Window(WorldObject):
         h.x = 0
         return 180 - math.degrees(math.acos(self.view_vector.z / h.length))
 
+    def get_center_coord(self) -> Coordinate3D:
+        return self.get_window_center()
 
     def _transform_coord(self, coord: Coordinate3D):
         # TODO: Add projection calculation
         new_point = Coordinate3D(coord.copy())
         new_point.translate(-self.get_window_center())
         # Make rotations
-
-        #new_point.rotate(angle=self._get_angle_with_y(), axis='y')
-        #new_point.rotate(angle=self._get_angle_with_x(), axis='x')
+        new_point.rotate(-self._get_angle_with_y(), 'y')
+        new_point.rotate(-self._get_angle_with_x(), 'x')
         #needs to also tranform window for this to work
         #new_point.rotate_z(-self._get_angle())
-
-
         new_point.x = new_point.x / (self.width * 0.5)
         new_point.y = new_point.y / (self.height * 0.5)
-        return Coordinate2D(new_point)
+        return Coordinate3D(new_point)
 
     def get_window_center(self) -> Coordinate3D:
         center = self.bottom_left + ((self.top_left-self.bottom_left)*0.5)
