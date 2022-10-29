@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter.messagebox import askyesno, showinfo
 from tkinter.ttk import Notebook
+from turtle import width
 from typing import Callable, Final, List, Literal, Tuple, TYPE_CHECKING
 from model.coordinate import Coordinate3D
 from model.world_objects.displayable import Displayable
@@ -184,7 +185,7 @@ class Gui:
     def __create_action_obj_form(self, obj: Displayable) -> None:
         form = Toplevel(self.__root)
         form.title("Ações")
-        form_frame = Frame(form, width=500, height=400)
+        form_frame = Frame(form, width=500, height=600)
         form_frame.pack(fill=BOTH, expand=True)
         form_frame.pack_propagate(False)
         self.__create_label(form_frame, f'Objeto selecionado: {obj.get_name()}', pady=25, padx=25, anchor=NW)
@@ -231,43 +232,76 @@ class Gui:
         frame = Frame(tabs)
         frame.pack(fill=BOTH, expand=True)
 
-        coords_frame = Frame(frame)
-        x_input = self.__create_input(coords_frame, "x", padx=40, align=LEFT)
-        y_input = self.__create_input(coords_frame, "y", padx=40, align=RIGHT)
-        coords_inputs = [x_input, y_input]
+        relative_to_frame = Frame(frame)
+        relative_to_frame.pack(pady=20)
+        coords_frame = Frame(relative_to_frame)
+        x_input = self.__create_input(coords_frame, "x", padx=40, align=LEFT, width=8)
+        y_input = self.__create_input(coords_frame, "y", padx=40, align=LEFT, width=8)
+        z_input = self.__create_input(coords_frame, 'z', padx=40, align=LEFT, width=8)
+        coords_inputs = [x_input, y_input, z_input]
         [inp.config(state=DISABLED) for inp in coords_inputs]
-
         relative_to = StringVar()
         relative_to.set('world')
-        Radiobutton(frame, text="Em torno do centro do mundo", variable=relative_to, value='world',
+        Radiobutton(relative_to_frame, text="Em torno do centro do mundo", variable=relative_to, value='world',
                     command=lambda: [inp.config(state=DISABLED) for inp in coords_inputs]) \
-            .pack(anchor=W, pady=8)
-        Radiobutton(frame, text="Em torno do centro do objeto", variable=relative_to, value='itself',
+            .pack(anchor=W, pady=4)
+        Radiobutton(relative_to_frame, text="Em torno do centro do objeto", variable=relative_to, value='itself',
                     command=lambda: [inp.config(state=DISABLED) for inp in coords_inputs]) \
-            .pack(anchor=W, pady=8)
-        Radiobutton(frame, text="Em torno de uma coordenada", variable=relative_to, value='coordinate',
+            .pack(anchor=W, pady=4)
+        Radiobutton(relative_to_frame, text="Em torno de uma coordenada", variable=relative_to, value='coordinate',
                     command=lambda: [inp.config(state=NORMAL) for inp in coords_inputs]) \
-            .pack(anchor=W, pady=8)
+            .pack(anchor=W, pady=4)
+        coords_frame.pack(pady=4)
 
-        coords_frame.pack(pady=10, fill=X)
-        self.__create_label(frame, "Ângulo")
-        angle_input = self.__create_input(frame)
+        axis_frame = Frame(frame)
+        axis_frame.pack(pady=20)
+        self.__create_label(axis_frame, "Em relação ao eixo")
+        axis_coords_frame = Frame(axis_frame)
+        a_x_input = self.__create_input(axis_coords_frame, "x", padx=40, align=LEFT, width=8)
+        a_y_input = self.__create_input(axis_coords_frame, "y", padx=40, align=LEFT, width=8)
+        a_z_input = self.__create_input(axis_coords_frame, 'z', padx=40, align=LEFT, width=8)
+        axis_coords_inputs = [a_x_input, a_y_input, a_z_input]
+        [inp.config(state=DISABLED) for inp in axis_coords_inputs]
+        axis = StringVar()
+        axis.set('z')
+        radio_frame = Frame(axis_frame)
+        Radiobutton(radio_frame, text="x", variable=axis, value='x',
+                    command=lambda: [inp.config(state=DISABLED) for inp in axis_coords_inputs]) \
+            .pack(side=LEFT, padx=4)
+        Radiobutton(radio_frame, text="y", variable=axis, value='y',
+                    command=lambda: [inp.config(state=DISABLED) for inp in axis_coords_inputs]) \
+            .pack(side=LEFT, padx=4)
+        Radiobutton(radio_frame, text="z", variable=axis, value='z',
+                    command=lambda: [inp.config(state=DISABLED) for inp in axis_coords_inputs]) \
+            .pack(side=LEFT, padx=4)
+        Radiobutton(radio_frame, text="Arbitrário", variable=axis, value='arbitrary',
+                command=lambda: [inp.config(state=NORMAL) for inp in axis_coords_inputs]) \
+            .pack(side=LEFT, padx=4)
+        radio_frame.pack()
+        axis_coords_frame.pack(pady=4)
+        
+        angle_frame = Frame(frame)
+        angle_frame.pack(pady=20)
+        self.__create_label(angle_frame, "Ângulo")
+        angle_input = self.__create_input(angle_frame)
 
         def handle_apply_btn(displayable: Displayable, var_rel_to: StringVar, angle_inp: Entry,
-                             x_inp: Entry, y_inp: Entry, z_inp: Entry =  None) -> None:
+                             x_inp: Entry, y_inp: Entry, z_inp: Entry, var_axis: StringVar,
+                             a_x_inp: Entry, a_y_inp: Entry, a_z_inp: Entry) -> None:
             local_relative_to = var_rel_to.get()
+            local_axis = var_axis.get()
             angle = float(angle_inp.get())
             center = None
-
+            arbitrary_axis = None
             if local_relative_to == 'coordinate':
-                x = float(x_inp.get())
-                y = float(y_inp.get())
-                z = float(z_inp.get()) if z_inp is not None else 0
-                center = Coordinate3D(x, y, z)
-            self.__controller.rotate_object(displayable=displayable, angle=angle, relative_to=local_relative_to, center=center)
+                center = Coordinate3D(float(x_inp.get()), float(y_inp.get()), float(z_inp.get()))
+            if local_axis == 'arbitrary':
+                arbitrary_axis = Coordinate3D(float(a_x_inp.get()), float(a_y_inp.get()), float(a_z_inp.get()))
+            
+            self.__controller.rotate_object(displayable, angle, local_relative_to, local_axis, center, arbitrary_axis)
 
         self.__create_button(frame, 'Aplicar', handle_apply_btn, obj, relative_to, angle_input,
-                             x_input, y_input, align=BOTTOM)
+                             x_input, y_input, z_input, align=BOTTOM)
         return frame
 
     def __create_gui(self) -> None:
