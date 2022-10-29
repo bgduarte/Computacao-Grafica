@@ -8,7 +8,10 @@ class Coordinate(List):
     limit_size = -1
 
     def __init__(self, x):
-        super().__init__(x[0:self.limit_size])
+        if self.limit_size != -1:
+            super().__init__(x[0:self.limit_size].copy())
+        else:
+            super().__init__(x.copy())
 
 
     def __neg__(self):
@@ -57,12 +60,13 @@ class Coordinate(List):
     def transform(self, transformations_matrices: list):
         vector = self.copy()
         vector.append(float(1))
+        vector = [vector]
         for t in transformations_matrices:
-            vector = MatrixHelper.dot(vector, t)
+            vector = MatrixHelper.mul(vector, t)
 
         # Defines the new coordinates, by removing the third element in the matrix
         for i in range(len(self)):
-            self[i] = vector[i]
+            self[i] = vector[0][i]
 
     def rotate(self, angle, axis: Literal['x', 'y', 'z']):
         self.transform([MatrixHelper.get_rotation_matrix(angle, axis)])
@@ -107,7 +111,7 @@ class Coordinate3D(Coordinate2D):
             super(Coordinate3D, self).__init__(x)
         else:
             if z is None:
-                z = 0
+                z = 1
             super(Coordinate3D, self).__init__([x, y, z])
 
     @property

@@ -18,15 +18,19 @@ class DebugHelper:
     def run(self):
         self.__controller.run()
 
-    def create_square(self, size: float, position: tuple):
-        position = Coordinate3D(position[0], position[1])
+    def create_square(self, size: float, position: list):
+        pos = Coordinate3D(x=position[0], y=position[1], z=0)
         points = [
-            position,
-            Coordinate3D(position.x + size, position.y),
-            Coordinate3D(position.x + size, position.y + size),
-            Coordinate3D(position.x , position.y + size),
+            Coordinate3D(pos.copy()),
+            Coordinate3D(x=pos.x + size, y= pos.y, z=0),
+            Coordinate3D(x=pos.x + size, y= pos.y, z=0),
+            Coordinate3D(x=pos.x + size, y=pos.y + size, z=0),
+            Coordinate3D(x=pos.x + size, y=pos.y + size, z=0),
+            Coordinate3D(x=pos.x, y=pos.y + size, z=0),
+            Coordinate3D(x=pos.x, y=pos.y + size, z=0),
+            Coordinate3D(pos.copy()),
         ]
-        square  = Wireframe(name = f'Square {self.__square_count}', coordinates=points, color='#000')
+        square = Wireframe(name=f'Square {self.__square_count}', coordinates=points, color='#000')
         self.__controller.observable_display_file.append(square)
         self.__square_count += 1
         return square
@@ -60,8 +64,8 @@ def main():
     helper = DebugHelper(controller)
     ## Place what you want to test here (display doesn't update automatically,
     # you need to trigger by using the interface)
-    # square1 = helper.create_square(position=(100, 100), size=30)
-    dot = helper.create_dot(position=(200,200))
+    square1 = helper.create_square(position=[100, 100], size=30)
+    #dot = helper.create_dot(position=(200,200))
     # curve = helper.create_spline_curve([
     #     Coordinate3D(100,100),
     #     Coordinate3D(200, 100),
@@ -70,10 +74,6 @@ def main():
     #     Coordinate3D(500, 100),
     #     Coordinate3D(600, 100),
     # ])
-    # line = helper.create_line((100, 100), (100, 200))
-    #square1.scale_around_self(Coordinate2D(2, 2))
-    #square1.translate(Coordinate2D(15, 0))
-    #square1.rotate_around_self(15)
 
     ##
     helper.run()

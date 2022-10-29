@@ -17,15 +17,15 @@ class Viewport:
     ZOOM_AMOUNT = 1.1
     NAVIGATION_SPEED = 0.07
     WINDOW_ROTATION_AMOUNT = 15
-    WINDOW_MOVEMENT_AMOUNT = 10
+    WINDOW_MOVEMENT_AMOUNT = 30
 
     def __init__(self, canvas: Canvas):
         self.__canvas = canvas
         self.__canvas.update()
         self.__window = Window(
-            top_left=Coordinate3D(0, self.get_height(), 0),
-            top_right=Coordinate3D(self.get_width(), self.get_height(), 0),
-            bottom_left=Coordinate3D(0, 0, 0)
+            top_left=Coordinate3D(0, self.get_height(), -30),
+            top_right=Coordinate3D(self.get_width(), self.get_height(), -30),
+            bottom_left=Coordinate3D(0, 0, -30)
         )
         self.__world_origin = Coordinate2D(0, 0)
         self.__draw_viewport()
@@ -79,11 +79,11 @@ class Viewport:
 
         for displayable in display_file:
             drawable = self.__window.coord_to_window_system(displayable.get_drawable())
-            drawable = self.__window.clip(drawable)
             for point in drawable.points:
-                self.__draw_point(point, drawable.color)
+                self.__draw_point(Coordinate2D(point), drawable.color)
             for line in drawable.lines:
-                self.__draw_line(line[0], line[1], drawable.color)
+                if line:
+                    self.__draw_line(Coordinate2D(line[0]), Coordinate2D(line[1]), drawable.color)
             # TODO: FILL OBJECTS WITH COLOR
         self.__canvas.update()
 
@@ -110,9 +110,9 @@ class Viewport:
         elif direction == 'right':
             self.__window.move_right(amount)
         elif direction == 'forward':
-            self.__window.move_forward(Viewport.WINDOW_MOVEMENT_AMOUNT)
-        elif direction == 'backward':
             self.__window.move_forward(-Viewport.WINDOW_MOVEMENT_AMOUNT)
+        elif direction == 'backward':
+            self.__window.move_forward(Viewport.WINDOW_MOVEMENT_AMOUNT)
         
     def tilt(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
         axis = 'y'
@@ -126,4 +126,4 @@ class Viewport:
     def rotate_window(self, direction: Literal['left', 'right']):
         amount = -Viewport.WINDOW_ROTATION_AMOUNT if direction == 'left' else Viewport.WINDOW_ROTATION_AMOUNT
         # TODO: make the rotation based on where the window is facing
-        self.__window.rotate_around_point(amount, self.__window.get_window_center())
+        self.__window.rotate_around_point(amount, self.__window.get_window_center(), 'z')

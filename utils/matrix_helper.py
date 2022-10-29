@@ -104,5 +104,8 @@ class MatrixHelper: # TODO: Generalize to 3D+ support
             return MatrixHelper.rotation_matrix_x(angle)
         elif axis == 'y':
             return MatrixHelper.rotation_matrix_y(angle)
-        else:
+        elif axis == 'z':
             return MatrixHelper.rotation_matrix_z(angle)
+        else:
+            raise Exception('kjgnrksjgn')
+7

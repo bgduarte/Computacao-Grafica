@@ -301,7 +301,7 @@ class Gui:
             self.__controller.rotate_object(displayable, angle, local_relative_to, local_axis, center, arbitrary_axis)
 
         self.__create_button(frame, 'Aplicar', handle_apply_btn, obj, relative_to, angle_input,
-                             x_input, y_input, z_input, align=BOTTOM)
+                             x_input, y_input, z_input, axis, a_x_input, a_y_input, a_z_input, align=BOTTOM)
         return frame
 
     def __create_gui(self) -> None:

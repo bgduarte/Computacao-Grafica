@@ -43,7 +43,8 @@ class WorldObject(ABC):
         return Coordinate3D(Coordinate3D(axis_sum)*(1/l))
 
     def rotate_around_self(self, angle: float, axis: Literal['x', 'y', 'z'] = 'y'): # angle in degrees
-        self.rotate_around_point(angle=angle, point=self.get_center_coord(), axis=axis)
+        point = self.get_center_coord()
+        self.rotate_around_point(angle=angle, point=point,axis=axis)
 
     def scale_around_self(self, scale_vector: Coordinate3D):
         center_coord = self.get_center_coord()
