@@ -19,16 +19,25 @@ class DebugHelper:
         self.__controller.run()
 
     def create_square(self, size: float, position: list):
-        pos = Coordinate3D(x=position[0], y=position[1], z=0)
+        position: Coordinate3D = Coordinate3D(position)
         points = [
-            Coordinate3D(pos.copy()),
-            Coordinate3D(x=pos.x + size, y= pos.y, z=0),
-            Coordinate3D(x=pos.x + size, y= pos.y, z=0),
-            Coordinate3D(x=pos.x + size, y=pos.y + size, z=0),
-            Coordinate3D(x=pos.x + size, y=pos.y + size, z=0),
-            Coordinate3D(x=pos.x, y=pos.y + size, z=0),
-            Coordinate3D(x=pos.x, y=pos.y + size, z=0),
-            Coordinate3D(pos.copy()),
+            Coordinate3D(x=position[0], y=position[1], z=0),
+            Coordinate3D(x=position.x + size, y= position.y, z=0),
+            Coordinate3D(x=position.x + size, y= position.y, z=0),
+            Coordinate3D(x=position.x + size, y=position.y + size, z=0),
+            Coordinate3D(x=position.x + size, y=position.y + size, z=0),
+            Coordinate3D(x=position.x, y=position.y + size, z=0),
+            Coordinate3D(x=position.x, y=position.y + size, z=0),
+            Coordinate3D(x=position[0], y=position[1], z=0),
+
+            Coordinate3D(x=position[0], y=position[1], z=size),
+            Coordinate3D(x=position.x + size, y=position.y, z=size),
+            Coordinate3D(x=position.x + size, y=position.y, z=size),
+            Coordinate3D(x=position.x + size, y=position.y + size, z=size),
+            Coordinate3D(x=position.x + size, y=position.y + size, z=size),
+            Coordinate3D(x=position.x, y=position.y + size, z=size),
+            Coordinate3D(x=position.x, y=position.y + size, z=size),
+            Coordinate3D(x=position[0], y=position[1], z=size),
         ]
         square = Wireframe(name=f'Square {self.__square_count}', coordinates=points, color='#000')
         self.__controller.observable_display_file.append(square)

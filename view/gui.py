@@ -297,8 +297,14 @@ class Gui:
                 center = Coordinate3D(float(x_inp.get()), float(y_inp.get()), float(z_inp.get()))
             if local_axis == 'arbitrary':
                 arbitrary_axis = Coordinate3D(float(a_x_inp.get()), float(a_y_inp.get()), float(a_z_inp.get()))
+                local_axis=None
             
-            self.__controller.rotate_object(displayable, angle, local_relative_to, local_axis, center, arbitrary_axis)
+            self.__controller.rotate_object(displayable=displayable,
+                                            angle=angle,
+                                            relative_to=local_relative_to,
+                                            axis=local_axis,
+                                            center=center,
+                                            arbitrary_axis_coord=arbitrary_axis)
 
         self.__create_button(frame, 'Aplicar', handle_apply_btn, obj, relative_to, angle_input,
                              x_input, y_input, z_input, axis, a_x_input, a_y_input, a_z_input, align=BOTTOM)

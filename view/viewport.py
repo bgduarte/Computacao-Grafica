@@ -115,15 +115,14 @@ class Viewport:
             self.__window.move_forward(Viewport.WINDOW_MOVEMENT_AMOUNT)
         
     def tilt(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
-        axis = 'y'
+        axis_vector:Coordinate3D = self.__window.up
         if direction == 'up' or direction == 'down':
-            axis = 'x'
-        amount = Viewport.WINDOW_ROTATION_AMOUNT
+            axis_vector = self.__window.right
+        amount = -Viewport.WINDOW_ROTATION_AMOUNT
         if direction == 'down' or direction == 'left':
             amount = -amount
-        self.__window.rotate_around_self(amount, axis)
-        
+        self.__window.rotate_around_self(amount, axis_vector=axis_vector)
+
     def rotate_window(self, direction: Literal['left', 'right']):
         amount = -Viewport.WINDOW_ROTATION_AMOUNT if direction == 'left' else Viewport.WINDOW_ROTATION_AMOUNT
-        # TODO: make the rotation based on where the window is facing
-        self.__window.rotate_around_point(amount, self.__window.get_window_center(), 'z')
+        self.__window.rotate_around_point(angle=amount, point=self.__window.get_window_center(), axis_vector=self.__window.view_vector)

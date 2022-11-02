@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from model.coordinate import Coordinate3D
 
 
-class MatrixHelper: # TODO: Generalize to 3D+ support
+class MatrixHelper:
     @staticmethod
     def degrees_to_radians(angle: float) -> float:
         return angle * (pi/180)

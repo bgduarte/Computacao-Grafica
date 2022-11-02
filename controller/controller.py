@@ -86,15 +86,14 @@ class Controller:
         
     def rotate_object(self, displayable: Displayable, angle: float,
                       relative_to: Literal['world', 'itself', 'coordinate'], 
-                      axis: Literal['x', 'y', 'z', 'arbitrary'], center: Coordinate3D = None,
+                      axis: Literal['x', 'y', 'z'], center: Coordinate3D = None,
                       arbitrary_axis_coord: Coordinate3D = None) -> None:
-        # TODO: fix this
         if relative_to == 'world':
-            displayable.rotate(angle=angle, axis=axis)
+            displayable.rotate(angle=angle, axis=axis, axis_vector=arbitrary_axis_coord)
         elif relative_to == 'itself':
-            displayable.rotate_around_self(angle=angle, axis=axis)
+            displayable.rotate_around_self(angle=angle, axis=axis, axis_vector=arbitrary_axis_coord)
         elif relative_to == 'coordinate':
-            displayable.rotate_around_point(angle=angle, point=center, axis=axis)
+            displayable.rotate_around_point(angle=angle, point=center, axis=axis, axis_vector=arbitrary_axis_coord)
         self.__viewport.draw(self.observable_display_file.displayables())
 
     def rotate_window(self, direction: Literal['left', 'right']) -> None:
