@@ -40,7 +40,7 @@ class Window(WorldObject):
 
         matrix = []
         # Translate everything so the window is in the origin
-        translation = -self.get_window_center()
+        translation = -self.center_back
         matrix.append(MatrixHelper.translation_matrix(translation))
 
         y_rotation = -(temp_window.view_vector.y_rotation_to_align_with_z())
@@ -60,7 +60,7 @@ class Window(WorldObject):
         points = [self._transform_coord(p) for p in drawable.points]
         lines = [[self._transform_coord(line[0]), self._transform_coord(line[1])] for line in
                  drawable.lines]
-        return self.clip(Displayable.Drawable(lines, points, drawable.color))
+        return Displayable.Drawable(lines, points, drawable.color)
 
     def clip(self, drawable: Displayable.Drawable) -> Displayable.Drawable:
         # applies clipping and appends if clipped is not null
@@ -104,11 +104,11 @@ class Window(WorldObject):
 
     @property
     def up(self) -> Coordinate3D:
-        return Coordinate3D(-(self.bottom_left - self.top_left).normalize())
+        return Coordinate3D((self.bottom_left - self.top_left).normalize())
 
     @property
     def right(self) -> Coordinate3D:
-        return Coordinate3D((self.top_right - self.top_left).normalize().copy())
+        return Coordinate3D((self.top_left - self.top_right).normalize().copy())
 
     def move_left(self, amount):
         movement_vector = -self.right * amount * self.width
@@ -127,7 +127,7 @@ class Window(WorldObject):
         self.translate(movement_vector)
 
     def move_forward(self, amount):
-        movement_vector = -self.view_vector * amount
+        movement_vector = self.view_vector * amount
         self.translate(movement_vector)
 
     # Returns the angle between the window up and the y-axis
@@ -139,14 +139,12 @@ class Window(WorldObject):
     def get_center_coord(self) -> Coordinate3D:
         return self.get_window_center()
 
-    def _transform_coord(self, coord: Coordinate3D):
-        # TODO: Add projection calculation
+    def _transform_coord(self, coord: Coordinate3D) -> Coordinate3D:
         new_point = Coordinate3D(coord.copy())
         new_point.transform(self.transformation_matrix)
-
         new_point.x = new_point.x / (self.width * 0.5)
         new_point.y = new_point.y / (self.height * 0.5)
-        return Coordinate3D(new_point)
+        return self.__project_in_perspective(new_point)
 
     def get_window_center(self) -> Coordinate3D:
         center = self.bottom_left + ((self.top_left - self.bottom_left) * 0.5)
@@ -155,3 +153,10 @@ class Window(WorldObject):
     def _constraint_check(self):
         if len(self._coordinates) != 3:
             raise Exception("A window must have exactly 3 coordinates")
+
+    def __project_in_perspective(self, coord: Coordinate3D) -> Coordinate3D:
+        d = self.center_back.z
+        # if coord.z == 0: coord.z = 1 # TODO: coord z = 1?
+        coord.x = d * coord.x / coord.z
+        coord.y = d * coord.y / coord.z
+        return coord

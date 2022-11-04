@@ -127,8 +127,8 @@ class Gui:
         Button(navigation_frame, text="⮞", command=lambda: self.__handle_tilt('right')).grid(row=2, column=3)
         Button(navigation_frame, text="⮟", command=lambda: self.__handle_tilt('down')).grid(row=3, column=2)
 
-        Button(navigation_frame, text="↥", command=lambda: self.__handle_move('forward')).grid(row=4, column=4)
-        Button(navigation_frame, text="↧", command=lambda: self.__handle_move('backward')).grid(row=4, column=3)
+        # Button(navigation_frame, text="↥", command=lambda: self.__handle_move('forward')).grid(row=4, column=4)
+        # Button(navigation_frame, text="↧", command=lambda: self.__handle_move('backward')).grid(row=4, column=3)
 
         Button(navigation_frame, text="+", command=lambda: self.__handle_zoom('in')).grid(row=4, column=1)
         Button(navigation_frame, text="–", command=lambda: self.__handle_zoom('out')).grid(row=4, column=0)

@@ -79,6 +79,7 @@ class Viewport:
 
         for displayable in display_file:
             drawable = self.__window.coord_to_window_system(displayable.get_drawable())
+            drawable = self.__window.clip(drawable)
             for point in drawable.points:
                 self.__draw_point(Coordinate2D(point), drawable.color)
             for line in drawable.lines:
@@ -110,15 +111,15 @@ class Viewport:
         elif direction == 'right':
             self.__window.move_right(amount)
         elif direction == 'forward':
-            self.__window.move_forward(-Viewport.WINDOW_MOVEMENT_AMOUNT)
-        elif direction == 'backward':
             self.__window.move_forward(Viewport.WINDOW_MOVEMENT_AMOUNT)
+        elif direction == 'backward':
+            self.__window.move_forward(-Viewport.WINDOW_MOVEMENT_AMOUNT)
         
     def tilt(self, direction: Literal['up', 'down', 'left', 'right']) -> None:
-        axis_vector:Coordinate3D = self.__window.up
+        axis_vector: Coordinate3D = self.__window.up
         if direction == 'up' or direction == 'down':
             axis_vector = self.__window.right
-        amount = -Viewport.WINDOW_ROTATION_AMOUNT
+        amount = Viewport.WINDOW_ROTATION_AMOUNT
         if direction == 'down' or direction == 'left':
             amount = -amount
         self.__window.rotate_around_self(amount, axis_vector=axis_vector)
