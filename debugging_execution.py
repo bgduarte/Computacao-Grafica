@@ -21,14 +21,14 @@ class DebugHelper:
     def create_square(self, size: float, position: list):
         position: Coordinate3D = Coordinate3D(position)
         points = [
-            Coordinate3D(x=position[0], y=position[1], z=0),
-            Coordinate3D(x=position.x + size, y= position.y, z=0),
-            Coordinate3D(x=position.x + size, y= position.y, z=0),
-            Coordinate3D(x=position.x + size, y=position.y + size, z=0),
-            Coordinate3D(x=position.x + size, y=position.y + size, z=0),
-            Coordinate3D(x=position.x, y=position.y + size, z=0),
-            Coordinate3D(x=position.x, y=position.y + size, z=0),
-            Coordinate3D(x=position[0], y=position[1], z=0),
+            Coordinate3D(x=position[0], y=position[1], z=10),
+            Coordinate3D(x=position.x + size, y= position.y, z=10),
+            Coordinate3D(x=position.x + size, y= position.y, z=10),
+            Coordinate3D(x=position.x + size, y=position.y + size, z=10),
+            Coordinate3D(x=position.x + size, y=position.y + size, z=10),
+            Coordinate3D(x=position.x, y=position.y + size, z=10),
+            Coordinate3D(x=position.x, y=position.y + size, z=10),
+            Coordinate3D(x=position[0], y=position[1], z=10),
 
             Coordinate3D(x=position[0], y=position[1], z=size),
             Coordinate3D(x=position.x + size, y=position.y, z=size),
@@ -74,7 +74,7 @@ def main():
     ## Place what you want to test here (display doesn't update automatically,
     # you need to trigger by using the interface)
     square1 = helper.create_square(position=[100, 100], size=30)
-    #dot = helper.create_dot(position=(200,200))
+    dot = helper.create_dot(position=(0,0))
     # curve = helper.create_spline_curve([
     #     Coordinate3D(100,100),
     #     Coordinate3D(200, 100),

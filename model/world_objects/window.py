@@ -92,7 +92,7 @@ class Window(WorldObject):
         up = self.bottom_left - self.top_left
         left = self.top_left - self.top_right
         back = up * left
-        return Coordinate3D(-back.normalize())
+        return Coordinate3D(back.normalize())
 
     @property
     def height(self) -> float:
@@ -104,11 +104,11 @@ class Window(WorldObject):
 
     @property
     def up(self) -> Coordinate3D:
-        return Coordinate3D((self.bottom_left - self.top_left).normalize())
+        return Coordinate3D(-(self.bottom_left - self.top_left).normalize())
 
     @property
     def right(self) -> Coordinate3D:
-        return Coordinate3D((self.top_left - self.top_right).normalize().copy())
+        return Coordinate3D((self.top_right - self.top_left).normalize().copy())
 
     def move_left(self, amount):
         movement_vector = -self.right * amount * self.width
@@ -128,7 +128,9 @@ class Window(WorldObject):
 
     def move_forward(self, amount):
         movement_vector = self.view_vector * amount
+        center_back = self.center_back.copy()
         self.translate(movement_vector)
+        #self._coordinates[3] = Coordinate3D(center_back)
 
     # Returns the angle between the window up and the y-axis
     def get_tilt_angle(self):
@@ -142,9 +144,10 @@ class Window(WorldObject):
     def _transform_coord(self, coord: Coordinate3D) -> Coordinate3D:
         new_point = Coordinate3D(coord.copy())
         new_point.transform(self.transformation_matrix)
+        self.__project_in_perspective(new_point)
         new_point.x = new_point.x / (self.width * 0.5)
         new_point.y = new_point.y / (self.height * 0.5)
-        return self.__project_in_perspective(new_point)
+        return new_point
 
     def get_window_center(self) -> Coordinate3D:
         center = self.bottom_left + ((self.top_left - self.bottom_left) * 0.5)

@@ -141,7 +141,7 @@ class Coordinate3D(Coordinate2D):
     def z_rotation_to_align_with_y(self):# angle to align with z
         h = Coordinate3D(self.copy())
         h.z = 0
-        c = -1 if h.x >= 0 else 1
+        c = 1 if h.x >= 0 else -1
         if h.length == 0:
             return 0
         return c * math.degrees(math.acos(h.y / h.length))

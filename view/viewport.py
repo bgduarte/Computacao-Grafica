@@ -17,15 +17,15 @@ class Viewport:
     ZOOM_AMOUNT = 1.1
     NAVIGATION_SPEED = 0.07
     WINDOW_ROTATION_AMOUNT = 15
-    WINDOW_MOVEMENT_AMOUNT = 30
+    WINDOW_MOVEMENT_AMOUNT = 10
 
     def __init__(self, canvas: Canvas):
         self.__canvas = canvas
         self.__canvas.update()
         self.__window = Window(
-            top_left=Coordinate3D(0, self.get_height(), -30),
-            top_right=Coordinate3D(self.get_width(), self.get_height(), -30),
-            bottom_left=Coordinate3D(0, 0, -30)
+            top_left=Coordinate3D(0, self.get_height(), 100),
+            top_right=Coordinate3D(self.get_width(), self.get_height(), 100),
+            bottom_left=Coordinate3D(0, 0, 100)
         )
         self.__world_origin = Coordinate2D(0, 0)
         self.__draw_viewport()
@@ -101,7 +101,7 @@ class Viewport:
         self.__zoom(Viewport.ZOOM_AMOUNT)
 
     def navigate(self, direction: Literal['up', 'down', 'left', 'right', 'forward', 'backward']):
-        amount =  Viewport.NAVIGATION_SPEED
+        amount = Viewport.NAVIGATION_SPEED
         if direction == 'up':
             self.__window.move_up(amount)
         elif direction == 'down':
